@@ -16,7 +16,7 @@ namespace SDSP
 {
     namespace RBJ 
     {
-        SDSP_UNUSED static void lowpass(double* target, double sampleRate, double cutoff, double q)
+        static inline void lowpass(double* target, double sampleRate, double cutoff, double q)
         {
             const double omega = juce::MathConstants<double>::twoPi * (cutoff / sampleRate);
             const double cosOmega = std::cos(omega);
@@ -29,7 +29,7 @@ namespace SDSP
             target[5] = 1 - alpha; // b2;
         }
 
-        SDSP_UNUSED static void highpass(double* target, double sampleRate, double cutoff, double q)
+        static inline void highpass(double* target, double sampleRate, double cutoff, double q)
         {
             const double omega = juce::MathConstants<double>::twoPi * (cutoff / sampleRate);
             const double cosOmega = std::cos(omega);
@@ -42,7 +42,7 @@ namespace SDSP
             target[5] = 1 - alpha; // b2
         }
 
-        SDSP_UNUSED static void allpass(double* target, double sampleRate, double cutoff, double q)
+        static inline void allpass(double* target, double sampleRate, double cutoff, double q)
         {
             const double omega = juce::MathConstants<double>::twoPi * (cutoff / sampleRate);
             const double cosOmega = std::cos(omega);
@@ -55,7 +55,7 @@ namespace SDSP
             target[5] = target[0]; // b2
         }
 
-        SDSP_UNUSED static void lowShelf(double* target, double sampleRate, double centreFreq, double dbGain, double slope)
+        static inline void lowShelf(double* target, double sampleRate, double centreFreq, double dbGain, double slope)
         {
             const double omega = juce::MathConstants<double>::twoPi * (centreFreq / sampleRate);
             const double cosOmega = std::cos(omega);
@@ -70,7 +70,7 @@ namespace SDSP
             target[5] = (A + 1) + (A - 1) * cosOmega - twoRootAa; // b2
         }
 
-        SDSP_UNUSED static void highShelf(double* target, double sampleRate, double centreFreq, double dbGain, double slope)
+        static inline void highShelf(double* target, double sampleRate, double centreFreq, double dbGain, double slope)
         {
             const double omega = juce::MathConstants<double>::twoPi * (centreFreq / sampleRate);
             const double cosOmega = std::cos(omega);
@@ -87,7 +87,7 @@ namespace SDSP
 
 
         // With peak gain
-        SDSP_UNUSED static void bandpass(double* target, double sampleRate, double centreFreq, double bandwidth, double peakGain)
+        static inline void bandpass(double* target, double sampleRate, double centreFreq, double bandwidth, double peakGain)
         {
             const double omega = juce::MathConstants<double>::twoPi * (centreFreq / sampleRate);
             const double sinOmega = std::sin(omega);
@@ -103,7 +103,7 @@ namespace SDSP
         }
 
         // 0db constant peak
-        SDSP_UNUSED static void bandpass(double* target, double sampleRate, double centreFreq, double bandwidth)
+        static inline void bandpass(double* target, double sampleRate, double centreFreq, double bandwidth)
         {
             const double omega = juce::MathConstants<double>::twoPi * (centreFreq / sampleRate);
             const double sinOmega = std::sin(omega);
@@ -118,7 +118,7 @@ namespace SDSP
             target[5] = 1 - alpha;
         }
 
-        SDSP_UNUSED static void bandreject(double* target, double sampleRate, double centreFreq, double bandwidth)
+        static inline void bandreject(double* target, double sampleRate, double centreFreq, double bandwidth)
         {
             const double omega = juce::MathConstants<double>::twoPi * (centreFreq / sampleRate);
             const double sinOmega = std::sin(omega);
@@ -134,7 +134,7 @@ namespace SDSP
         }
 
         // BW = width between dbGain / 2 gain frequencies
-        SDSP_UNUSED static void bell(double* target, double sampleRate, double gainDB, double centreFreq, double bandwidth)
+        static inline void bell(double* target, double sampleRate, double gainDB, double centreFreq, double bandwidth)
         {
             const double A = std::pow(10, gainDB / 40.0);
             const double omega = juce::MathConstants<double>::twoPi * (centreFreq / sampleRate);
