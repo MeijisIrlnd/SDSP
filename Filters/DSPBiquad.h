@@ -18,7 +18,7 @@
 namespace SDSP
 {
     template<int N>
-    static inline std::array<double, N / 2> getButterworthQs()
+    constexpr static inline std::array<double, N / 2> getButterworthQs()
     {
         std::array<double, N / 2> res;
         constexpr auto poleSpacing = juce::MathConstants<double>::pi / static_cast<double>(N);
