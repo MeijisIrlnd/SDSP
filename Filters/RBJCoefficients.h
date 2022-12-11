@@ -89,7 +89,6 @@ namespace SDSP
 
         // With peak gain
         static inline void bandpass(double* target, double sampleRate, double centreFreq, double bandwidth, double peakGain)
-        static inline void bandpass(double* target, double sampleRate, double centreFreq, double bandwidth, double peakGain)
         {
             const double omega = juce::MathConstants<double>::twoPi * (centreFreq / sampleRate);
             const double sinOmega = std::sin(omega);
@@ -105,7 +104,6 @@ namespace SDSP
         }
 
         // 0db constant peak
-        static inline void bandpass(double* target, double sampleRate, double centreFreq, double bandwidth)
         static inline void bandpass(double* target, double sampleRate, double centreFreq, double bandwidth)
         {
             const double omega = juce::MathConstants<double>::twoPi * (centreFreq / sampleRate);
@@ -137,7 +135,6 @@ namespace SDSP
         }
 
         // BW = width between dbGain / 2 gain frequencies
-        static inline void bell(double* target, double sampleRate, double gainDB, double centreFreq, double bandwidth)
         static inline void bell(double* target, double sampleRate, double gainDB, double centreFreq, double bandwidth)
         {
             const double A = std::pow(10, gainDB / 40.0);
