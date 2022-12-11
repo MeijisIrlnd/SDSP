@@ -11,5 +11,6 @@ license: Commercial
 dependencies: juce_core
 END_JUCE_MODULE_DECLARATION
 #endif
-
+using APVTS = juce::AudioProcessorValueTreeState;
+#include "Macros.h"
 #include "Filters/Filters.h"

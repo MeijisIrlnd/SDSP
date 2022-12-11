@@ -17,6 +17,26 @@
 #include "RBJCoefficients.h"
 namespace SDSP
 {
+    template<int N>
+    static inline std::array<double, N / 2> getButterworthQs()
+    {
+        std::array<double, N / 2> res;
+        constexpr auto poleSpacing = juce::MathConstants<double>::pi / static_cast<double>(N);
+        if constexpr(N % 2 == 0) {
+            // First pole is poleSpacing /  2 radians from the real axis
+            for (auto i = 0; i < N / 2; i++) {
+                res[i] = 1 / (2 * juce::dsp::FastMathApproximations::cos<double>((poleSpacing / 2.0) + (i * poleSpacing)));
+            }
+        }
+        else {
+            for (auto i = 0; i < N / 2; i++) {
+                // spacing + i * spacing right? 
+                res[i] = 1 / (2 * juce::dsp::FastMathApproximations::cos<double>(poleSpacing + (i * poleSpacing)));
+            }
+        }
+        return res;
+    }
+
     class BiQuadDelay
     {
     public:
