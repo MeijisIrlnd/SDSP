@@ -1,4 +1,5 @@
 #pragma once 
+#include <juce_core/juce_core.h>
 namespace SDSP::Utils 
 { 
 	//https://github.com/stekyne/PhaseVocoder/blob/master/DSP/Resample.h thank you again stekyne..
@@ -23,5 +24,20 @@ namespace SDSP::Utils
 	    	newSignal[i] = lerp(sampleA, sampleB, fractionIndex);
 	    	index += scale;
 	    }
+    }
+
+    inline static juce::AudioBuffer<float> resampleAudioBuffer(juce::AudioBuffer<float>& toResample, double originalSampleRate, double newSampleRate) 
+    { 
+        juce::AudioBuffer<float> resampled;
+        double ratio = originalSampleRate / newSampleRate;
+        resampled.setSize(toResample.getNumChannels(), static_cast<int>(toResample.getNumSamples() / ratio));
+        auto* read = toResample.getArrayOfReadPointers();
+        auto* write = resampled.getArrayOfWritePointers();
+        for (auto channel = 0; channel < toResample.getNumChannels(); channel++) {
+            juce::LagrangeInterpolator resampler;
+            resampler.reset();
+            resampler.process(ratio, read[channel], write[channel], resampled.getNumSamples());
+        }
+        return resampled;
     }
 }
