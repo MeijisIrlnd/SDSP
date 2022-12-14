@@ -8,9 +8,12 @@ version: 1.0.0
 name: SDSP
 description: Syl DSP, catchy right?
 license: Commercial
-dependencies: juce_core
+dependencies: juce_core, juce_dsp
 END_JUCE_MODULE_DECLARATION
 #endif
 using APVTS = juce::AudioProcessorValueTreeState;
 #include "Macros.h"
 #include "Filters/Filters.h"
+#include "Fourier/STFT.h"
+#include "Types/Types.h"
+#include "Utils/Utils.h"
