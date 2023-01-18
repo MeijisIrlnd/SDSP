@@ -26,6 +26,7 @@ namespace SDSP::Fourier
         SDSP_INLINE constexpr static int getFFTSize() { return m_fftSize; }
         SDSP_INLINE constexpr static int getAnalysisHopSize() { return m_analysisHopSize; }
         SDSP_INLINE constexpr static int getWindowSize() { return WindowSize; }
+
         SDSP_INLINE void process(const float* data, float* out, size_t bufferSize, std::function<void(float*, size_t)>& callback) noexcept
         {
             for (auto internalOffset = 0, internalBufferSize = 0; internalOffset < bufferSize; internalOffset += internalBufferSize)
@@ -79,6 +80,5 @@ namespace SDSP::Fourier
 
         std::vector<float> m_spectralBuffer;
         std::vector<float> m_windowData;
-
     };
 }

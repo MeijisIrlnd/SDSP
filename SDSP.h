@@ -18,3 +18,4 @@ using APVTS = juce::AudioProcessorValueTreeState;
 #include "Types/Types.h"
 #include "Utils/Utils.h"
 #include "KMath.h"
+#include "Types/CircularBuffer.h"
