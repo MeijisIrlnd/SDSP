@@ -1,15 +1,16 @@
 #include <juce_dsp/juce_dsp.h> 
+#include <unordered_map>
 #include <functional>
 namespace SDSP 
 { 
     class LFO 
     { 
     public: 
-        enum class LFO_SHAPE { 
+        enum class LFO_SHAPE {
             SINE
-        }
+        };
         
-        LFO(LFO_SHAPE shape) { 
+        LFO(const LFO_SHAPE& shape) { 
             m_oscillator.initialise(m_lookup[shape]);
         }
         
@@ -38,11 +39,11 @@ namespace SDSP
             }
         }
     private:
-        bool m_hasBeenPrepared(false);
+        bool m_hasBeenPrepared{ false };
         float m_frequency{5.0f};
         juce::dsp::Oscillator<float> m_oscillator;
-        static inline std::unordered_map<LFO_SHAPE, std::function<float(float)> > m_lookup { 
-            {LFO_SHAPE::SINE, [](float x) { return juce::FastMathApproximations::sin<float>(x); }}
+        std::unordered_map<LFO_SHAPE, std::function<float(float)> > m_lookup { 
+            {LFO_SHAPE::SINE, [](float x) { return juce::dsp::FastMathApproximations::sin<float>(x); }}
         };
     };
 }
