@@ -48,6 +48,13 @@ namespace SDSP
             return start + (end - start) * distance;
         }
 
+        template<typename T>
+        static inline T log(T x, T base) { 
+            
+            auto logA = std::log2(x);
+            auto logB = std::log2(base);
+            return logA / logB;
+        }
 
 
 
