@@ -17,5 +17,6 @@ using APVTS = juce::AudioProcessorValueTreeState;
 #include "Fourier/Fourier.h"
 #include "Types/Types.h"
 #include "Utils/Utils.h"
+#include "Utils/LFO.h"
 #include "KMath.h"
 #include "Types/CircularBuffer.h"
