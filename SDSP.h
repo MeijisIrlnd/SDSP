@@ -20,3 +20,4 @@ using APVTS = juce::AudioProcessorValueTreeState;
 #include "Utils/LFO.h"
 #include "KMath.h"
 #include "Types/CircularBuffer.h"
+#include "Types/MultitapCircularBuffer.h"
