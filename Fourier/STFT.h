@@ -81,4 +81,55 @@ namespace SDSP::Fourier
         std::vector<float> m_spectralBuffer;
         std::vector<float> m_windowData;
     };
+
+    template<int WindowSize, int FFTOrder> 
+    class STFTWrapper 
+    { 
+    public:
+        STFTWrapper() 
+        {
+        }
+        ~STFTWrapper() 
+        { 
+        }
+
+        STFTWrapper(const STFTWrapper& other) = delete;
+        STFTWrapper(STFTWrapper&& other) noexcept = delete;
+        STFTWrapper& operator=(const STFTWrapper& other) = delete;
+        STFTWrapper& operator=(STFTWrapper&& other) noexcept = delete;
+
+        float processSample(float in, const size_t bufferSize) 
+        { 
+            if(m_data.size() != bufferSize) { 
+                m_data.resize(bufferSize);
+                juce::FloatVectorOperations::fill(m_data.data(), 0.0f, bufferSize);
+            }
+            if(m_accumulator.size() != bufferSize) { 
+                m_accumulator.resize(bufferSize);
+                juce::FloatVectorOperations::fill(m_accumulator.data(), 0.0f, bufferSize);
+            }
+            if(!m_hasPerformedFirstTransform) { 
+                m_samplesUntilUpdate = bufferSize;
+                m_hasPerformedFirstTransform = true;
+            }
+            if(m_samplesUntilUpdate == 0) { 
+                m_stft.process(m_accumulator.data(), m_data.data(), bufferSize, stftCallback);
+                m_samplesUntilUpdate = bufferSize;
+                m_writePos = 0;
+            }
+            m_accumulator[m_writePos] = in;
+            float out = m_data[m_writePos];
+            ++m_writePos;
+            --m_samplesUntilUpdate;
+            return out;
+        }
+
+        std::function<void(float*, size_t)> stftCallback{nullptr};
+    private: 
+        bool m_hasPerformedFirstTransform{false};
+        std::vector<float> m_accumulator, m_data;
+
+        int m_samplesUntilUpdate{0}, m_writePos{0};
+        STFT<WindowSize, FFTOrder> m_stft;
+    };
 }
