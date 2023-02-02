@@ -13,6 +13,7 @@
 #include <inttypes.h>
 #include <vector>
 #include <juce_core/juce_core.h>
+#include <juce_dsp/juce_dsp.h>
 #include "../Macros.h"
 #include "RBJCoefficients.h"
 namespace SDSP
