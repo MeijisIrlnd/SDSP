@@ -21,3 +21,5 @@ END_JUCE_MODULE_DECLARATION
 #include "KMath.h"
 #include "Types/CircularBuffer.h"
 #include "Types/MultitapCircularBuffer.h"
+#include "Helpers/Helpers.h"
+#include "Utils/DelayTimeInterpolator.h"

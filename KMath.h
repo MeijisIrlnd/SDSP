@@ -55,6 +55,46 @@ namespace SDSP
             auto logB = std::log2(base);
             return logA / logB;
         }
+        static inline bool isPrime(int x) {
+            for(int i = 3; i < std::sqrt(x); i += 2) {
+                if(x % i == 0) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        static inline float getNearestCoprime(float toCheck)
+        {
+            int above = std::ceil(toCheck);
+            int below = std::floor(toCheck);
+            if(above <= 2) {
+                return 2;
+            }
+            if(below == 2) {
+                return (toCheck - 2 < 0.5f) ? 2 : 3;
+            }
+            if(below % 2 == 0) {
+                below -= 1;
+            }
+            if(above % 2 == 0) {
+                above += 1;
+            }
+
+            double deltaBelow = std::numeric_limits<double>::max(), deltaAbove = std::numeric_limits<double>::max();;
+            for(;; above += 2, below -= 2) {
+                if(isPrime(below)){
+                    deltaBelow = toCheck - below;
+                }
+                if(isPrime(above)) {
+                    deltaAbove = above - toCheck;
+                }
+                if(deltaAbove != std::numeric_limits<double>::max() || deltaBelow != std::numeric_limits<double>::max()) {
+                    break;
+                }
+            }
+            return static_cast<int>(deltaAbove < deltaBelow ? above : below);
+        }
 
 
 
