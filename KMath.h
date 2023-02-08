@@ -43,9 +43,9 @@ namespace SDSP
         }
 
         template<typename T> 
-        static T Lerp(T start, T end, T distance)
+        static T Lerp(T start, T end, float distance)
         {
-            return start + (end - start) * distance;
+            return static_cast<T>(start + (end - start) * distance);
         }
 
         template<typename T>
