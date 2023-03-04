@@ -3,13 +3,13 @@
 namespace SDSP 
 { 
     template<int NTAPS>
-    class MultitapCircularBuffer 
+    class SDSP_UNUSED MultitapCircularBuffer
     { 
         public: 
             MultitapCircularBuffer() { 
                 std::fill(m_delayTimes.begin(), m_delayTimes.end(), 0.0f);
             }
-            void prepareToPlay(int samplesPerBlockExpected, double sampleRate) { 
+            void prepareToPlay(SDSP_UNUSED int samplesPerBlockExpected, double sampleRate) {
                 m_sampleRate = sampleRate;
                 m_buffer.resize(m_maxDelaySeconds * sampleRate);
                 std::fill(m_buffer.begin(), m_buffer.end(), 0.0f);
@@ -53,8 +53,8 @@ namespace SDSP
 
             }
 
-            void setMaximumDelaySeconds(float maxDelaySeconds) { 
-                m_maxDelaySeconds = m_maxDelaySeconds;
+            SDSP_UNUSED void setMaximumDelaySeconds(float maxDelaySeconds) {
+                m_maxDelaySeconds = maxDelaySeconds;
                 if(m_hasBeenPrepared) { 
                     m_buffer.resize(m_maxDelaySeconds * m_sampleRate);
                     std::fill(m_buffer.begin(), m_buffer.end(), 0.0f);
@@ -70,7 +70,7 @@ namespace SDSP
 
         private:
             bool m_hasBeenPrepared{false};
-            double m_sampleRate;
+            double m_sampleRate{};
             std::vector<float> m_buffer;
             int m_write = 0;
             std::array<int, NTAPS> m_read;

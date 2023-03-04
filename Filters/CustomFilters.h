@@ -8,7 +8,7 @@
 
 namespace SDSP::Filters
 {
-    static inline void fdnDecayFilter(std::array<double, 2>& targetB, std::array<double, 2>& targetA, double sampleRate, int delayLineLength, double dcRT60, double halfSRRT60)
+    SDSP_UNUSED static inline void fdnDecayFilter(std::array<double, 2>& targetB, std::array<double, 2>& targetA, double sampleRate, int delayLineLength, double dcRT60, double halfSRRT60)
     {
         // g_i = 10^(-3MiT/t60(0))
         auto samplingPeriod = 1 / sampleRate;
@@ -28,7 +28,7 @@ namespace SDSP::Filters
         targetA[1] = -p_i;
     }
 
-    static inline void fdnTonalCorrectionFilter(std::array<double, 2>& targetB, std::array<double, 2>& targetA, double dcRT60, double halfSRRT60)
+    SDSP_UNUSED static inline void fdnTonalCorrectionFilter(std::array<double, 2>& targetB, std::array<double, 2>& targetA, double dcRT60, double halfSRRT60)
     {
         auto alpha = halfSRRT60 / dcRT60;
         auto x = (1 - alpha) / (1 + alpha);
@@ -37,7 +37,7 @@ namespace SDSP::Filters
         targetA[0] = 1;
     }
 
-    static inline std::tuple<double, double> fdnDecayFilter(double sampleRate, int delayLineLength, double dcRT60, double halfSRRT60)
+    SDSP_UNUSED static inline std::tuple<double, double> fdnDecayFilter(double sampleRate, int delayLineLength, double dcRT60, double halfSRRT60)
     {
         // g_i = 10^(-3MiT/t60(0))
         auto samplingPeriod = 1 / sampleRate;
@@ -54,12 +54,11 @@ namespace SDSP::Filters
         return {(g_i * (1 - p_i)), -p_i};
     }
 
-    struct SinglePole
+    struct SDSP_UNUSED SinglePole
     {
         SDSP_INLINE float processSample(float in) noexcept {
             // y(n) = b0x(n) - a1x(n-1)
             coeffs.interpolate();
-            float currentB{0}, currentA{0};
             float x = static_cast<float>(coeffs.currentBCoeffs[0] * in) + static_cast<float>(coeffs.currentBCoeffs[1] * m_prev) - static_cast<float>(coeffs.currentACoeffs[1] * m_prev);
             m_prev = x;
             return x;
@@ -69,19 +68,19 @@ namespace SDSP::Filters
             std::array<double, 2> currentBCoeffs = {0.0f, 0.0f}, targetBCoeffs = {0.0f, 0.0f};
             std::array<double, 2> currentACoeffs = {1.0f, 0.0f}, targetACoeffs = {1.0f, 0.0f};
 
-            SDSP_INLINE void setCurrentAndTarget(const std::array<double, 2>& bCoeffs, const std::array<double, 2>& aCoeffs) noexcept {
+            SDSP_UNUSED SDSP_INLINE void setCurrentAndTarget(const std::array<double, 2>& bCoeffs, const std::array<double, 2>& aCoeffs) noexcept {
                 juce::FloatVectorOperations::copy(targetBCoeffs.data(), bCoeffs.data(), 2);
                 juce::FloatVectorOperations::copy(currentBCoeffs.data(), bCoeffs.data(), 2);
                 juce::FloatVectorOperations::copy(targetACoeffs.data(), aCoeffs.data(), 2);
                 juce::FloatVectorOperations::copy(currentACoeffs.data(), aCoeffs.data(), 2);
             }
 
-            SDSP_INLINE void setTarget(const std::array<double, 2>& bCoeffs, const std::array<double, 2>& aCoeffs) noexcept {
+            SDSP_UNUSED SDSP_INLINE void setTarget(const std::array<double, 2>& bCoeffs, const std::array<double, 2>& aCoeffs) noexcept {
                 juce::FloatVectorOperations::copy(targetBCoeffs.data(), bCoeffs.data(), 2);
                 juce::FloatVectorOperations::copy(targetACoeffs.data(), aCoeffs.data(), 2);
             }
 
-            SDSP_INLINE void interpolate() noexcept {
+            SDSP_UNUSED SDSP_INLINE void interpolate() noexcept {
                 for(size_t i = 0; i < 2; ++i) {
                     currentBCoeffs[i] = currentBCoeffs[i] - 0.004 * (currentBCoeffs[i] - targetBCoeffs[i]);
                     currentACoeffs[i] = currentACoeffs[i] - 0.004 * (currentACoeffs[i] - targetACoeffs[i]);
@@ -89,6 +88,6 @@ namespace SDSP::Filters
             }
         } coeffs;
     private:
-        float m_prev;
+        float m_prev{};
     };
 }

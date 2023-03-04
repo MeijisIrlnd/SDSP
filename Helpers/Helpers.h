@@ -18,17 +18,17 @@ namespace SDSP::Helpers
         (SDSP::Helpers::is_std_array<T>::value && std::is_arithmetic<typename T::value_type>::value) || std::is_array<T>::value;
 
     template<typename T> requires NumericArray<T>
-    static inline void zero_array(T& data) {
+    SDSP_UNUSED static inline void zero_array(T& data) {
         std::memset(data.data(), 0.0f, sizeof(typename T::value_type) * data.size());
     }
 
     template<typename T> requires NumericArray<T>
-    static inline void copy_array(T& dest, T& src) {
+    SDSP_UNUSED static inline void copy_array(T& dest, T& src) {
         std::memcpy(dest.data(), src.data(), sizeof(typename T::value_type) * dest.size());
     }
 
     template<typename T> requires NumericArray<T>
-    static inline void fill_array(T& dest, typename T::value_type value) {
+    SDSP_UNUSED static inline void fill_array(T& dest, typename T::value_type value) {
         std::memset(dest.data(), value, sizeof(typename T::value_type) * dest.size());
     }
 }

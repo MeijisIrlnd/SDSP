@@ -20,10 +20,7 @@ namespace SDSP
     class LineRamp
     {
     public:
-        LineRamp<T>()
-        {
-
-        }
+        LineRamp<T>() = default;
         virtual ~LineRamp() {}
         void prepare(double sampleRate)
         {
@@ -75,7 +72,7 @@ namespace SDSP
         }
 
     protected:
-        bool running = false;
+        SDSP_UNUSED bool running{false};
         T currentValue = 0.0;
         double samplesPerMs;
         juce::uint64 remainingTicks;

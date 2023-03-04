@@ -10,7 +10,7 @@ namespace SDSP
     {
     public:
         BlockCircularBuffer() = default;
-        BlockCircularBuffer(size_t size) {
+        SDSP_UNUSED explicit BlockCircularBuffer(size_t size) {
             setSize(size, true);
         }
 
@@ -22,10 +22,10 @@ namespace SDSP
             m_writeHopSize = newSize;
         }
 
-        SDSP_INLINE const size_t getReadHopSize() { return m_readHopSize; }
-        SDSP_INLINE const size_t getWriteHopSize() { return m_writeHopSize; }
-        SDSP_INLINE const size_t getReadIndex() { return m_readIndex; }
-        SDSP_INLINE const size_t getWriteIndex() { return m_writeIndex; }
+        SDSP_UNUSED SDSP_INLINE size_t getReadHopSize() { return m_readHopSize; }
+        SDSP_UNUSED SDSP_INLINE size_t getWriteHopSize() { return m_writeHopSize; }
+        SDSP_UNUSED SDSP_INLINE size_t getReadIndex() { return m_readIndex; }
+        SDSP_UNUSED SDSP_INLINE size_t getWriteIndex() { return m_writeIndex; }
 
         SDSP_INLINE void setSize(size_t newSize, bool clear = false)
         {

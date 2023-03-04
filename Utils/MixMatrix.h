@@ -17,7 +17,7 @@ namespace SDSP
 			for (int i = 0; i < size; ++i) {
 				arr[i] += sum;
 			}
-		};
+		}
 	};
 	
 	// Use like `Hadamard<double, 8>::inPlace(data)` - size must be a power of 2

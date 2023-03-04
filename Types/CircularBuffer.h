@@ -32,7 +32,7 @@ namespace SDSP
             std::memset(buffer, 0, static_cast<size_t>(sampleRate * 5) * sizeof(T));
         }
 
-        CircularBuffer<T>(double interp) : interpolationTimeMs(static_cast<int>(interp)) {
+        explicit CircularBuffer<T>(double interp) : interpolationTimeMs(static_cast<int>(interp)) {
 
         }
 
@@ -85,9 +85,9 @@ namespace SDSP
             interpolator.set(m, interpolationTimeMs);
         }
 
-        void setInterpolationRate(double interpTimeMs)
+        SDSP_UNUSED void setInterpolationRate(double interpTimeMs)
         {
-            interpolationTimeMs = interpTimeMs;
+            interpolationTimeMs = static_cast<int>(interpTimeMs);
         }
 
         inline T getNextSample(T in)
@@ -109,11 +109,6 @@ namespace SDSP
 
         }
 
-        inline T getNextSampleInterpolated(T in)
-        {
-
-        }
-
     private:
         std::mutex m_mutex;
         juce::SmoothedValue<float> delayTimeInterpolator;
@@ -121,8 +116,8 @@ namespace SDSP
         T* buffer = nullptr;
         T* recordHead;
         T* playbackHead;
-        double m_sampleRate;
-        size_t bufferSize;
+        double m_sampleRate{};
+        size_t bufferSize{};
         int interpolationTimeMs = 500;
         double m_maxDelaySeconds{5};
 

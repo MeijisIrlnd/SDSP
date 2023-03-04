@@ -10,3 +10,7 @@
 #define SDSP_INLINE __attribute__((always_inline))
 #endif
 #endif
+
+#ifndef SDSP_NODISCARD
+#define SDSP_NODISCARD [[nodiscard]]
+#endif

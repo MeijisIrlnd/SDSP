@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <inttypes.h>
+#include <cinttypes>
 #include <vector>
 #include <juce_core/juce_core.h>
 #include <juce_dsp/juce_dsp.h>
@@ -86,7 +86,7 @@ namespace SDSP
             // If we write dif eq as y = a0*x + a1*xz_1 + a2*xz_2 - b0*yz_1 - b1*yz_2, 
             // 
             //then the passed coeffs arg should be a concatenated groups of 5 coeffs containing 
-            //{a0, a1, a2, b0, b1}, with the number of these groups determing the number of sections
+            //{a0, a1, a2, b0, b1}, with the number of these groups determining the number of sections
             for (uint32_t frame = 0; frame < NumFrames; frame++) {
                 float sectionInput = input[frame];
                 for (uint32_t sec = 0; sec < m_numSections; sec++) {
@@ -115,7 +115,7 @@ namespace SDSP
                 m_biquadDelays.at(i).reset();
             }
         }
-        uint32_t getNumSections() const { return m_numSections; }
+        SDSP_UNUSED SDSP_NODISCARD uint32_t getNumSections() const { return m_numSections; }
     private:
         uint32_t m_numSections;
         std::vector<BiQuadDelay> m_biquadDelays;

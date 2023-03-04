@@ -7,7 +7,7 @@
 namespace SDSP
 {
     template<typename ArrayType> requires Helpers::NumericArray<ArrayType>
-    struct DelayTimeInterpolator
+    struct SDSP_UNUSED DelayTimeInterpolator
     {
         DelayTimeInterpolator() {
             Helpers::zero_array(target);

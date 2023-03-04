@@ -26,7 +26,7 @@ namespace SDSP
             return std::log2f(val);
         }
 
-        static double fastPow(double a, double b) {
+       SDSP_UNUSED static double fastPow(double a, double b) {
             //union {
             //    double d;
             //    int x[2];
@@ -38,24 +38,24 @@ namespace SDSP
         }
 
         template<typename T, typename U>
-        constexpr double dmod(T x, U mod) {
+        SDSP_UNUSED constexpr double dmod(T x, U mod) {
             return !mod ? x : x - mod * static_cast<long long>(x / mod);
         }
 
         template<typename T> 
-        static T Lerp(T start, T end, float distance)
+        SDSP_UNUSED static T Lerp(T start, T end, float distance)
         {
             return static_cast<T>(start + (end - start) * distance);
         }
 
         template<typename T>
-        static inline T log(T x, T base) { 
+        SDSP_UNUSED static inline T log(T x, T base) {
             
             auto logA = std::log2(x);
             auto logB = std::log2(base);
             return logA / logB;
         }
-        static inline bool isPrime(int x) {
+        SDSP_UNUSED static inline bool isPrime(int x) {
             for(int i = 3; i < std::sqrt(x); i += 2) {
                 if(x % i == 0) {
                     return false;
@@ -64,7 +64,7 @@ namespace SDSP
             return true;
         }
 
-        static inline float getNearestCoprime(float toCheck)
+        SDSP_UNUSED static inline float getNearestCoprime(float toCheck)
         {
             int above = std::ceil(toCheck);
             int below = std::floor(toCheck);
@@ -104,7 +104,7 @@ namespace SDSP
             499, 503, 509, 521, 523, 541
         };
 
-        static inline float nearestPrime(float p_i, float M_i) {
+        SDSP_UNUSED static inline float nearestPrime(float p_i, float M_i) {
             auto m_i = std::roundf(std::logf(M_i) / std::logf(p_i));
             return std::powf(p_i, m_i);
         }

@@ -23,17 +23,19 @@ namespace SDSP::Fourier
             std::fill(m_spectralBuffer.begin(), m_spectralBuffer.end(), 0.0f);
             
         }
-        SDSP_INLINE constexpr static int getFFTSize() { return m_fftSize; }
-        SDSP_INLINE constexpr static int getAnalysisHopSize() { return m_analysisHopSize; }
-        SDSP_INLINE constexpr static int getWindowSize() { return WindowSize; }
+        SDSP_UNUSED SDSP_INLINE constexpr static int getFFTSize() { return m_fftSize; }
+        SDSP_UNUSED SDSP_INLINE constexpr static int getAnalysisHopSize() { return m_analysisHopSize; }
+        SDSP_UNUSED SDSP_INLINE constexpr static int getWindowSize() { return WindowSize; }
 
         SDSP_INLINE void process(const float* data, float* out, size_t bufferSize, std::function<void(float*, size_t)>& callback) noexcept
         {
-            for (auto internalOffset = 0, internalBufferSize = 0; internalOffset < bufferSize; internalOffset += internalBufferSize)
+            int internalBufferSize;
+            for (auto internalOffset = 0; internalOffset < bufferSize; internalOffset += internalBufferSize)
             {
-                const auto remainingSamples = (bufferSize - internalOffset);
+                const auto remainingSamples = (bufferSize - static_cast<size_t>(internalOffset));
                 internalBufferSize = m_incomingSampleCount + remainingSamples >= m_samplesUntilNextProcess ? m_samplesUntilNextProcess - m_incomingSampleCount : remainingSamples;
-                const auto previousAnalysisWriteIndex = m_analysisBuffer.getReadIndex();
+                // unused?
+                //const auto previousAnalysisWriteIndex = m_analysisBuffer.getReadIndex();
                 m_analysisBuffer.write(data + internalOffset, internalBufferSize);
                 m_incomingSampleCount += internalBufferSize;
                 if (m_incomingSampleCount >= m_samplesUntilNextProcess)
@@ -83,15 +85,11 @@ namespace SDSP::Fourier
     };
 
     template<int WindowSize, int FFTOrder> 
-    class STFTWrapper 
+    class SDSP_UNUSED STFTWrapper
     { 
     public:
-        STFTWrapper() 
-        {
-        }
-        ~STFTWrapper() 
-        { 
-        }
+        STFTWrapper() = default;
+        ~STFTWrapper() = default;
 
         STFTWrapper(const STFTWrapper& other) = delete;
         STFTWrapper(STFTWrapper&& other) noexcept = delete;
@@ -109,12 +107,12 @@ namespace SDSP::Fourier
                 juce::FloatVectorOperations::fill(m_accumulator.data(), 0.0f, bufferSize);
             }
             if(!m_hasPerformedFirstTransform) { 
-                m_samplesUntilUpdate = bufferSize;
+                m_samplesUntilUpdate = static_cast<int>(bufferSize);
                 m_hasPerformedFirstTransform = true;
             }
             if(m_samplesUntilUpdate == 0) { 
                 m_stft.process(m_accumulator.data(), m_data.data(), bufferSize, stftCallback);
-                m_samplesUntilUpdate = bufferSize;
+                m_samplesUntilUpdate = static_cast<int>(bufferSize);
                 m_writePos = 0;
             }
             m_accumulator[m_writePos] = in;

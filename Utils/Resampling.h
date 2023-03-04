@@ -1,9 +1,10 @@
 #pragma once 
 #include <juce_core/juce_core.h>
+#include "../Macros.h"
 namespace SDSP::Utils 
 { 
-	//https://github.com/stekyne/PhaseVocoder/blob/master/DSP/Resample.h thank you again stekyne..
-    inline static void linearResample(const float* const input, const int originalSize, float* const newSignal, const int newSignalSize) 
+	//https://github.com/stekyne/PhaseVocoder/blob/master/DSP/Resample.h thank you again stekyne.
+    SDSP_UNUSED inline static void linearResample(const float* const input, const int originalSize, float* const newSignal, const int newSignalSize)
     { 
 	    const auto lerp = [&](float v0, float v1, float t)
 	    {
@@ -12,13 +13,13 @@ namespace SDSP::Utils
 
 	    // If the original signal is bigger than the new size, condense the signal to fit the new buffer
 	    // otherwise expand the signal to fit the new buffer
-	    const auto scale = originalSize / (float)newSignalSize;
+	    const auto scale = static_cast<float>(originalSize) / static_cast<float>(newSignalSize);
 	    float index = 0.f;
 
 	    for (int i = 0; i < newSignalSize; ++i)
 	    {
 	    	const auto wholeIndex = (int)std::floor(index);
-	    	const auto fractionIndex = index - wholeIndex;
+	    	const auto fractionIndex = index - static_cast<float>(wholeIndex);
 	    	const auto sampleA = input[wholeIndex];
 	    	const auto sampleB = input[wholeIndex + 1];
 	    	newSignal[i] = lerp(sampleA, sampleB, fractionIndex);

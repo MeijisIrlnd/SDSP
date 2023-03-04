@@ -348,7 +348,7 @@ ServiceFabricBackup/
 
 # Business Intelligence projects
 *.rdl.data
-*.bim.layout
+*.bim.m_layout
 *.bim_*.settings
 *.rptproj.rsuser
 *- [Bb]ackup.rdl
