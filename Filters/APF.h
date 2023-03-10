@@ -31,7 +31,7 @@ namespace SDSP::Filters
             juce::dsp::ProcessSpec spec{sampleRate, static_cast<juce::uint32>(samplesPerBlockExpected), 1};
             m_delayLine.prepare(spec);
             // Allow pad for delay modulation
-            m_delayLine.setMaximumDelayInSamples(m_delayTimeSamples + 32);
+            m_delayLine.setMaximumDelayInSamples(static_cast<int>(sampleRate / 4.0));
             m_delayLine.setDelay(static_cast<float>(m_delayTimeSamples));
             m_smoothedCoeff.reset(sampleRate, 0.1);
             m_smoothedCoeff.setCurrentAndTargetValue(m_coeff);
@@ -119,4 +119,5 @@ namespace SDSP::Filters
         juce::dsp::Oscillator<float> m_lfo;
         juce::SmoothedValue<float> m_smoothedDelayTimeSamples;
     };
+
 }

@@ -40,19 +40,6 @@ namespace SDSP::RBJ
             target[5] = 1 - alpha; // b2
         }
 
-        SDSP_UNUSED static inline void allpass(double* target, double sampleRate, double cutoff, double q)
-        {
-            const double omega = juce::MathConstants<double>::twoPi * (cutoff / sampleRate);
-            const double cosOmega = std::cos(omega);
-            const double alpha = std::sin(omega) / static_cast<double>(2 * q);
-            target[0] = 1 - alpha; // a0
-            target[1] = -2 * cosOmega; // a1
-            target[2] = 1 + alpha; // a2
-            target[3] = target[2]; // b0
-            target[4] = target[1]; // b1
-            target[5] = target[0]; // b2
-        }
-
         SDSP_UNUSED static inline void lowShelf(double* target, double sampleRate, double centreFreq, double dbGain, double slope)
         {
             const double omega = juce::MathConstants<double>::twoPi * (centreFreq / sampleRate);
@@ -146,5 +133,18 @@ namespace SDSP::RBJ
             target[3] = 1 + (alpha / A);
             target[4] = -2 * cosOmega;
             target[5] = 1 - (alpha / A);
+        }
+
+        SDSP_UNUSED static inline void allpass(double* target, double sampleRate, double centreFrequency, double Q)
+        {
+            const auto omega = juce::MathConstants<double>::twoPi * (centreFrequency / sampleRate);
+            const auto alpha = std::sin(omega) / (2 * Q);
+            const auto cosOmega = std::cos(omega);
+            target[0] = 1 - alpha;
+            target[1] = -2 * cosOmega;
+            target[2] = 1 + alpha;
+            target[3] = 1 + alpha;
+            target[4] = -2 * cosOmega;
+            target[5] = 1 - alpha;
         }
     }
