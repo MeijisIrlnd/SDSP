@@ -120,4 +120,46 @@ namespace SDSP::Filters
         juce::SmoothedValue<float> m_smoothedDelayTimeSamples;
     };
 
+    class APF2ndOrder {
+    public:
+        [[maybe_unused]] float tap(const int index) {
+            return m_delayLine.popSample(0, static_cast<float>(index), false);
+        }
+
+        void prepareToPlay(int samplesPerBlockExpected, double sampleRate) {
+            m_delayLine.prepare({sampleRate, static_cast<juce::uint32>(samplesPerBlockExpected), 1});
+            m_delayLine.setMaximumDelayInSamples(static_cast<int>(sampleRate / 2.0));
+            m_delayLine.setDelay(static_cast<float>(m_delayTimeSamples));
+            m_hasBeenPrepared = true;
+        }
+        float processSample(float x) noexcept {
+            auto delayed = m_delayLine.popSample(0);
+            m_delayLine.pushSample(0, x + (delayed * m_coeff));
+            delayed *= (1 - (m_coeff * m_coeff));
+            auto feedforward = x * -m_coeff;
+            auto out = delayed + feedforward;
+            out *= (1 - (m_coeff * m_coeff));
+            feedforward = x * -m_coeff;
+            return out + feedforward;
+        }
+
+        void setDelayTimeSamples(int newDelayTimeSamples) {
+            m_delayTimeSamples = newDelayTimeSamples;
+            if(m_hasBeenPrepared) {
+                m_delayLine.setDelay(static_cast<float>(m_delayTimeSamples));
+            }
+        }
+
+        void setCoeff(float newCoeff) {
+            m_coeff = newCoeff;
+        }
+
+    private:
+        bool m_hasBeenPrepared{ false };
+        float m_coeff{};
+        int m_delayTimeSamples{};
+        juce::dsp::DelayLine<float> m_delayLine;
+    };
+
+
 }
