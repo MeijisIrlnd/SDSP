@@ -23,3 +23,4 @@ END_JUCE_MODULE_DECLARATION
 #include "Types/MultitapCircularBuffer.h"
 #include "Helpers/Helpers.h"
 #include "Utils/DelayTimeInterpolator.h"
+#include "Utils/BlendableLFO.h"
