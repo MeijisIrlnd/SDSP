@@ -5,15 +5,22 @@
 #include <juce_dsp/juce_dsp.h>
 #include "../Macros.h"
 #include "../KMath.h"
+#include <SDSP/Oscillators/SDSPOscillator.h>
 namespace SDSP
 {
     class BlendableLFO
     {
     public:
-        BlendableLFO(const std::function<float(float)>& generator1, const std::function<float(float)>& generator2) :
-        m_generator1(generator1), m_generator2(generator2)
-        {
+        BlendableLFO() = default;
 
+        BlendableLFO(SDSP::Oscillators::SHAPE shape1, SDSP::Oscillators::SHAPE shape2) : m_osc1(true), m_osc2(true) {
+            m_osc1.setShape(shape1);
+            m_osc2.setShape(shape2);
+        }
+
+        [[maybe_unused]] void setShapes(SDSP::Oscillators::SHAPE shape1, SDSP::Oscillators::SHAPE shape2) {
+            m_osc1.setShape(shape1);
+            m_osc2.setShape(shape2);
         }
 
         SDSP_INLINE void setRate(float newRate) noexcept {
@@ -27,29 +34,30 @@ namespace SDSP
         }
 
         void prepareToPlay(int samplesPerBlockExpected, double sampleRate) {
-            juce::dsp::ProcessSpec spec{sampleRate, static_cast<juce::uint32>(samplesPerBlockExpected), 1};
-            m_osc1.prepare(spec);
-            m_osc1.initialise(m_generator1);
-
-            m_osc2.prepare(spec);
-            m_osc2.initialise(m_generator2);
-
+            m_osc1.prepareToPlay(samplesPerBlockExpected, sampleRate);
+            m_osc2.prepareToPlay(samplesPerBlockExpected, sampleRate);
+            m_osc1.setFrequency(m_rate);
+            m_osc2.setFrequency(m_rate);
+            m_osc1.retrigger();
+            m_osc2.retrigger();
         }
 
         [[nodiscard]] float getNextSample() noexcept {
             // 0 - 0.5 => 1 to 2
             // 0.5 - 1 => 2 to 3
-            auto out1 = m_osc1.processSample(0.0f);
-            auto out2 = m_osc2.processSample(0.0f);
+            auto out1 = m_osc1.processSample();
+            auto out2 = m_osc2.processSample();
             // ((max - min) * T) + min;
             auto blended = KMath::Lerp<float>(out1, out2, m_blendPos);
             return blended;
+
         }
 
     private:
+        double m_sampleRate{ 44100 };
         float m_blendPos{ 0.0f };
         float m_rate{ 0.01f };
         std::function<float(float)> m_generator1, m_generator2;
-        juce::dsp::Oscillator<float> m_osc1, m_osc2;
+        Oscillators::SDSPOscillator m_osc1, m_osc2;
     };
 }

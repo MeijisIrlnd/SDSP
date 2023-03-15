@@ -109,5 +109,21 @@ namespace SDSP
             return std::powf(p_i, m_i);
         }
 
+        [[maybe_unused]] [[nodiscard]] static inline double polyBlep(double t, double phaseIncrement) noexcept {
+            // this gets you out of radians, we're already out of radians, with 0 to 1 phase
+            //double dt = phaseIncrement / juce::MathConstants<float>::twoPi;
+            double dt = phaseIncrement;
+            if(t < dt) {
+                t /= dt;
+                return t + t - t * t - 1.0;
+            }
+            else if(t > 1.0 - dt) {
+                t = (t - 1.0) / dt;
+                return t * t + t + t + 1.0;
+            }
+            return 0;
+
+        }
+
     }
 }
