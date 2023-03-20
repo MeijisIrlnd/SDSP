@@ -5,5 +5,5 @@ DSP Helper user module for Juce
 ## Features 
 - Biquads, RBJ formulae and interpolating coefficients 
 - Some half implemented maths stuff 
-- STFT, and OLA capable circular buffers, mostly ripped from [stekyne](https://github.com/stekyne)'s Phase Vocoder implementation (4ever in ur debt)
+- STFT, and OLA capable circular buffers, via a repurposed, single header subset of [Signalsmith](https://signalsmith-audio.co.uk/code/dsp)'s dsp library
 - Audio file loading (with resampling)
