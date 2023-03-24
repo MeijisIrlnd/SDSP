@@ -1,6 +1,7 @@
 #pragma once 
 #include <complex>
 #include <cmath>
+#include <vector>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327950288
@@ -764,10 +765,10 @@ namespace signalsmith
 }
     // delay.h
     namespace delay {
-	/**	@defgroup Delay Delay utilities
+	/**	@defgroup PitchDelayProcessor PitchDelayProcessor utilities
 		@brief Standalone templated classes for delays
 		
-		You can set up a `Buffer` or `MultiBuffer`, and get interpolated samples using a `Reader` (separately on each channel in the multi-channel case) - or you can use `Delay`/`MultiDelay` which include their own buffers.
+		You can set up a `Buffer` or `MultiBuffer`, and get interpolated samples using a `Reader` (separately on each channel in the multi-channel case) - or you can use `PitchDelayProcessor`/`MultiDelay` which include their own buffers.
 
 		Interpolation quality is chosen using a template class, from @ref Interpolators.
 
@@ -1093,7 +1094,7 @@ namespace signalsmith
 	};
 	
 	/** \defgroup Interpolators Interpolators
-		\ingroup Delay
+		\ingroup PitchDelayProcessor
 		@{ */
 	/// Nearest-neighbour interpolator
 	/// \diagram{delay-random-access-nearest.svg,aliasing and maximum amplitude/delay errors for different input frequencies}
@@ -1139,7 +1140,7 @@ namespace signalsmith
 		}
 	};
 
-	// Efficient Algorithms and Structures for Fractional Delay Filtering Based on Lagrange Interpolation
+	// Efficient Algorithms and Structures for Fractional PitchDelayProcessor Filtering Based on Lagrange Interpolation
 	// Franck 2009 https://www.aes.org/e-lib/browse.cfm?elib=14647
 	namespace _franck_impl {
 		template<typename Sample, int n, int low, int high>
@@ -1345,7 +1346,7 @@ namespace signalsmith
 			int startIndex = delaySamples;
 			Sample remainder = delaySamples - startIndex;
 			
-			// Delay buffers use negative indices, but interpolators use positive ones
+			// PitchDelayProcessor buffers use negative indices, but interpolators use positive ones
 			using View = decltype(buffer - startIndex);
 			struct Flipped {
 				 View view;
@@ -1377,7 +1378,7 @@ namespace signalsmith
 		}
 		
 		/** Read a sample from `delaySamples` >= 0 in the past.
-		The interpolator may add its own latency on top of this (see `Delay::latency`).  The default interpolation (linear) has 0 latency.
+		The interpolator may add its own latency on top of this (see `PitchDelayProcessor::latency`).  The default interpolation (linear) has 0 latency.
 		*/
 		Sample read(Sample delaySamples) const {
 			return Super::read(buffer, delaySamples);
@@ -1409,7 +1410,7 @@ namespace signalsmith
 			multiBuffer.resize(channels, capacity + Super::inputLength, value);
 		}
 		
-		/// A single-channel delay-line view, similar to a `const Delay`
+		/// A single-channel delay-line view, similar to a `const PitchDelayProcessor`
 		struct ChannelView {
 			static constexpr Sample latency = Super::latency;
 
@@ -1651,6 +1652,9 @@ namespace signalsmith
 			const Complex * operator [](int channel) const {
 				return buffer.data() + channel*stride;
 			}
+
+            [[maybe_unused]] [[nodiscard]] SIGNALSMITH_INLINE int getChannels() const { return channels; }
+            [[maybe_unused]] [[nodiscard]] SIGNALSMITH_INLINE int getStride() const { return stride; }
 		};
 		std::vector<Sample> timeBuffer;
 
