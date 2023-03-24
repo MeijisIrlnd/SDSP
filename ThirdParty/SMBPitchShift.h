@@ -50,9 +50,9 @@
 #endif
 #define MAX_FRAME_LENGTH 8192
 namespace SMB {
-    void smbFft(float *fftBuffer, long fftFrameSize, long sign);
+    static void smbFft(float *fftBuffer, long fftFrameSize, long sign);
 
-    double smbAtan2(double x, double y);
+    static double smbAtan2(double x, double y);
 
 
 // -----------------------------------------------------------------------------------------------------------------
