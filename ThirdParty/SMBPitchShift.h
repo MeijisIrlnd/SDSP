@@ -40,6 +40,7 @@
 *
 *****************************************************************************/
 #pragma once
+#include "SignalsmithDSP.h"
 #include <string.h>
 #include <math.h>
 #include <stdio.h>
@@ -64,9 +65,10 @@ namespace SMB {
         std::array<float, MAX_FRAME_LENGTH> m_inFifo{}, m_outFifo{}, m_analysisFrequencies{}, m_analysisMagnitudes{}, m_synthesisFrequencies{}, m_synthesisMagnitudes{};
         std::array<float, 2 * MAX_FRAME_LENGTH> m_fftWorkspace{}, m_outputAccumulator{};
         std::array<float, MAX_FRAME_LENGTH / 2 + 1> m_lastPhase{}, m_sumPhase{};
+        std::vector<std::complex<float> > m_spectrum{};
         long m_rOver{ false };
         long m_fftFrameSize{}, m_oversamplingFactor{};
-
+        signalsmith::fft::RealFFT<float> m_fft;
     public:
         explicit SMBPitchShift(long fftFrameSize, long oversamplingFactor) : m_fftFrameSize(fftFrameSize), m_oversamplingFactor(oversamplingFactor) {
             std::memset(m_inFifo.data(), 0, MAX_FRAME_LENGTH * sizeof(float));
@@ -77,6 +79,9 @@ namespace SMB {
             std::memset(m_outputAccumulator.data(), 0, 2 * MAX_FRAME_LENGTH * sizeof(float));
             std::memset(m_analysisFrequencies.data(), 0, MAX_FRAME_LENGTH * sizeof(float));
             std::memset(m_analysisMagnitudes.data(), 0, MAX_FRAME_LENGTH * sizeof(float));
+            m_spectrum.resize(static_cast<size_t>((fftFrameSize) / 2) + 1);
+            std::fill(m_spectrum.begin(), m_spectrum.end(), std::complex<float>{0.0f, 0.0f});
+            m_fft.setSize(static_cast<size_t>(fftFrameSize));
         }
 
         void prepareToPlay(int /*samplesPerBlockExpected*/, double sampleRate) {
@@ -117,8 +122,9 @@ namespace SMB {
 
                 /* ***************** ANALYSIS ******************* */
                 /* do transform */
-                smbFft(m_fftWorkspace.data(), m_fftFrameSize, -1);
+                // replace this with Signalsmith's fft?
 
+                smbFft(m_fftWorkspace.data(), m_fftFrameSize, -1);
                 /* this is the analysis step */
                 for (k = 0; k <= fftFrameSize2; k++) {
 
@@ -220,6 +226,140 @@ namespace SMB {
 
         }
 
+        float processSampleSSFFT(float x) noexcept {
+            auto out{ 0.0f };
+            double magn, phase, tmp, window, real, imag;
+            double freqPerBin, expct;
+            long i, k, qpd, index, inFifoLatency, stepSize, fftFrameSize2;
+
+            /* set up some handy variables */
+            fftFrameSize2 = m_fftFrameSize / 2;
+            stepSize = m_fftFrameSize / m_oversamplingFactor;
+            freqPerBin = m_sampleRate / (double) m_fftFrameSize;
+            expct = 2. * M_PI * (double) stepSize / (double) m_fftFrameSize;
+            inFifoLatency = m_fftFrameSize - stepSize;
+            if (m_rOver == false) m_rOver = inFifoLatency;
+
+
+            /* As long as we have not yet collected enough data just read in */
+            m_inFifo[m_rOver] = x;
+            out = m_outFifo[m_rOver - inFifoLatency];
+            m_rOver++;
+
+            /* now we have enough data for processing */
+            if (m_rOver >= m_fftFrameSize) {
+                m_rOver = inFifoLatency;
+
+                // could remove this and use Signalsmith's windowed fft class instead..
+                /* do windowing and re,im interleave */
+                for (k = 0; k < m_fftFrameSize; k++) {
+                    window = -.5 * cos(2. * M_PI * (double) k / (double) m_fftFrameSize) + .5;
+                    m_fftWorkspace[2 * k] = m_inFifo[k] * window;
+                    m_fftWorkspace[2 * k + 1] = 0.;
+                }
+
+
+                /* ***************** ANALYSIS ******************* */
+                /* do transform */
+                // replace this with Signalsmith's fft?
+                m_fft.fft(m_fftWorkspace, m_spectrum);
+                /* this is the analysis step */
+                for (k = 0; k <= fftFrameSize2; k++) {
+                    /* compute magnitude and phase */
+                    auto currentBin = m_spectrum[k];
+                    magn = 2 * std::sqrt(std::pow(currentBin.real(), 2) + std::pow(currentBin.imag(), 2));
+                    phase = atan2(currentBin.imag(), currentBin.real());
+
+                    /* compute phase difference */
+                    tmp = phase - m_lastPhase[k];
+                    m_lastPhase[k] = phase;
+
+                    /* subtract expected phase difference */
+                    tmp -= (double) k * expct;
+
+                    /* map delta phase into +/- Pi interval */
+                    qpd = tmp / M_PI;
+                    if (qpd >= 0) qpd += qpd & 1;
+                    else qpd -= qpd & 1;
+                    tmp -= M_PI * (double) qpd;
+
+                    /* get deviation from bin frequency from the +/- Pi interval */
+                    tmp = m_oversamplingFactor * tmp / (2. * M_PI);
+
+                    /* compute the k-th partials' true frequency */
+                    tmp = (double) k * freqPerBin + tmp * freqPerBin;
+
+                    /* store magnitude and true frequency in analysis arrays */
+                    m_analysisMagnitudes[k] = magn;
+                    m_analysisFrequencies[k] = tmp;
+
+                }
+
+                /* ***************** PROCESSING ******************* */
+                /* this does the actual pitch shifting */
+                memset(m_synthesisMagnitudes.data(), 0, m_fftFrameSize * sizeof(float));
+                memset(m_synthesisFrequencies.data(), 0, m_fftFrameSize * sizeof(float));
+                for (k = 0; k <= fftFrameSize2; k++) {
+                    index = k * m_shift;
+                    if (index <= fftFrameSize2) {
+                        m_synthesisMagnitudes[index] += m_analysisMagnitudes[k];
+                        m_synthesisFrequencies[index] = m_analysisFrequencies[k] * m_shift;
+                    }
+                }
+
+                /* ***************** SYNTHESIS ******************* */
+                /* this is the synthesis step */
+                for (k = 0; k <= fftFrameSize2; k++) {
+
+                    /* get magnitude and true frequency from synthesis arrays */
+                    magn = m_synthesisMagnitudes[k];
+                    tmp = m_synthesisFrequencies[k];
+
+                    /* subtract bin mid frequency */
+                    tmp -= (double) k * freqPerBin;
+
+                    /* get bin deviation from freq deviation */
+                    tmp /= freqPerBin;
+
+                    /* take osamp into account */
+                    tmp = 2. * M_PI * tmp / m_oversamplingFactor;
+
+                    /* add the overlap phase advance back in */
+                    tmp += (double) k * expct;
+
+                    /* accumulate delta phase to get bin phase */
+                    m_sumPhase[k] += tmp;
+                    phase = m_sumPhase[k];
+
+                    /* get real and imag part and re-interleave */
+                    // don't fucking reinterleave lmaooo
+                    m_spectrum[k] = { static_cast<float>(magn * std::cos(phase)), static_cast<float>(magn * std::sin(phase)) };
+                    //m_fftWorkspace[2 * k] = magn * cos(phase);
+                    //m_fftWorkspace[2 * k + 1] = magn * sin(phase);
+                }
+
+                /* zero negative frequencies */
+                for (k = m_fftFrameSize + 2; k < 2 * m_fftFrameSize; k++) m_fftWorkspace[k] = 0.;
+
+                m_fft.ifft(m_spectrum, m_fftWorkspace);
+
+                /* do windowing and add to output accumulator */
+                for (k = 0; k < m_fftFrameSize; k++) {
+                    window = -.5 * cos(2. * M_PI * (double) k / (double) m_fftFrameSize) + .5;
+                    m_outputAccumulator[k] += 2. * window * m_fftWorkspace[2 * k] / (fftFrameSize2 * m_oversamplingFactor);
+                }
+                for (k = 0; k < stepSize; k++) m_outFifo[k] = m_outputAccumulator[k];
+
+                /* shift accumulator */
+                memmove(m_outputAccumulator.data(), m_outputAccumulator.data() + stepSize,
+                        m_fftFrameSize * sizeof(float));
+
+                /* move input FIFO */
+                for (k = 0; k < inFifoLatency; k++) m_inFifo[k] = m_inFifo[k + stepSize];
+            }
+            return out;
+
+        }
         SDSP_INLINE void setShift(float newShift) noexcept {
             m_shift = newShift;
         }
