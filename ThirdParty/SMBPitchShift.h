@@ -10,7 +10,7 @@
 * KNOWN BUGS: none
 *
 * SYNOPSIS: Routine for doing pitch shifting while maintaining
-* duration using the Short Time Fourier Transform.
+* duration ustd::sing the Short Time Fourier Transform.
 *
 * DESCRIPTION: The routine takes a pitchShift factor value which is between 0.5
 * (one octave down) and 2. (one octave up). A value of exactly 1 does not change
@@ -18,7 +18,7 @@
 * numSampsToProcess-1] should be pitch shifted and moved to outdata[0 ...
 * numSampsToProcess-1]. The two buffers can be identical (ie. it can process the
 * data in-place). fftFrameSize defines the FFT frame size used for the
-* processing. Typical values are 1024, 2048 and 4096. It may be any value <=
+* processtd::sing. Typical values are 1024, 2048 and 4096. It may be any value <=
 * MAX_FRAME_LENGTH but it MUST be a power of 2. osamp is the STFT
 * oversampling factor which also determines the overlap between adjacent STFT
 * frames. It should at least be 4 for moderate scaling ratios. A value of 32 is
@@ -41,9 +41,9 @@
 *****************************************************************************/
 #pragma once
 #include "SignalsmithDSP.h"
-#include <string.h>
-#include <math.h>
-#include <stdio.h>
+#include <juce_dsp/juce_dsp.h>
+#include <string>>
+#include <cmath>
 #include <array>
 #include "../Macros.h"
 #ifndef M_PI
@@ -108,13 +108,13 @@ namespace SMB {
             out = m_outFifo[m_rOver - inFifoLatency];
             m_rOver++;
 
-            /* now we have enough data for processing */
+            /* now we have enough data for processtd::sing */
             if (m_rOver >= m_fftFrameSize) {
                 m_rOver = inFifoLatency;
 
                 /* do windowing and re,im interleave */
                 for (k = 0; k < m_fftFrameSize; k++) {
-                    window = -.5 * cos(2. * M_PI * (double) k / (double) m_fftFrameSize) + .5;
+                    window = -.5 * juce::dsp::FastMathApproximations::cos(2. * M_PI * (double) k / (double) m_fftFrameSize) + .5;
                     m_fftWorkspace[2 * k] = m_inFifo[k] * window;
                     m_fftWorkspace[2 * k + 1] = 0.;
                 }
@@ -161,7 +161,7 @@ namespace SMB {
 
                 }
 
-                /* ***************** PROCESSING ******************* */
+                /* ***************** PROCESstd::sinG ******************* */
                 /* this does the actual pitch shifting */
                 memset(m_synthesisMagnitudes.data(), 0, m_fftFrameSize * sizeof(float));
                 memset(m_synthesisFrequencies.data(), 0, m_fftFrameSize * sizeof(float));
@@ -198,8 +198,8 @@ namespace SMB {
                     phase = m_sumPhase[k];
 
                     /* get real and imag part and re-interleave */
-                    m_fftWorkspace[2 * k] = magn * cos(phase);
-                    m_fftWorkspace[2 * k + 1] = magn * sin(phase);
+                    m_fftWorkspace[2 * k] = magn * juce::dsp::FastMathApproximations::cos(phase);
+                    m_fftWorkspace[2 * k + 1] = magn * std::sin(phase);
                 }
 
                 /* zero negative frequencies */
@@ -210,7 +210,7 @@ namespace SMB {
 
                 /* do windowing and add to output accumulator */
                 for (k = 0; k < m_fftFrameSize; k++) {
-                    window = -.5 * cos(2. * M_PI * (double) k / (double) m_fftFrameSize) + .5;
+                    window = -.5 * juce::dsp::FastMathApproximations::cos(2. * M_PI * (double) k / (double) m_fftFrameSize) + .5;
                     m_outputAccumulator[k] += 2. * window * m_fftWorkspace[2 * k] / (fftFrameSize2 * m_oversamplingFactor);
                 }
                 for (k = 0; k < stepSize; k++) m_outFifo[k] = m_outputAccumulator[k];
@@ -246,14 +246,14 @@ namespace SMB {
             out = m_outFifo[m_rOver - inFifoLatency];
             m_rOver++;
 
-            /* now we have enough data for processing */
+            /* now we have enough data for processtd::sing */
             if (m_rOver >= m_fftFrameSize) {
                 m_rOver = inFifoLatency;
 
                 // could remove this and use Signalsmith's windowed fft class instead..
                 /* do windowing and re,im interleave */
                 for (k = 0; k < m_fftFrameSize; k++) {
-                    window = -.5 * cos(2. * M_PI * (double) k / (double) m_fftFrameSize) + .5;
+                    window = -.5 * juce::dsp::FastMathApproximations::cos(2. * M_PI * (double) k / (double) m_fftFrameSize) + .5;
                     m_fftWorkspace[2 * k] = m_inFifo[k] * window;
                     m_fftWorkspace[2 * k + 1] = 0.;
                 }
@@ -295,7 +295,7 @@ namespace SMB {
 
                 }
 
-                /* ***************** PROCESSING ******************* */
+                /* ***************** PROCESstd::sinG ******************* */
                 /* this does the actual pitch shifting */
                 memset(m_synthesisMagnitudes.data(), 0, m_fftFrameSize * sizeof(float));
                 memset(m_synthesisFrequencies.data(), 0, m_fftFrameSize * sizeof(float));
@@ -333,9 +333,9 @@ namespace SMB {
 
                     /* get real and imag part and re-interleave */
                     // don't fucking reinterleave lmaooo
-                    m_spectrum[k] = { static_cast<float>(magn * std::cos(phase)), static_cast<float>(magn * std::sin(phase)) };
-                    //m_fftWorkspace[2 * k] = magn * cos(phase);
-                    //m_fftWorkspace[2 * k + 1] = magn * sin(phase);
+                    m_spectrum[k] = { static_cast<float>(magn * juce::dsp::FastMathApproximations::cos(phase)), static_cast<float>(magn * std::sin(phase)) };
+                    //m_fftWorkspace[2 * k] = magn * juce::dsp::FastMathApproximations::cos(phase);
+                    //m_fftWorkspace[2 * k + 1] = magn * std::sin(phase);
                 }
 
                 /* zero negative frequencies */
@@ -345,7 +345,7 @@ namespace SMB {
 
                 /* do windowing and add to output accumulator */
                 for (k = 0; k < m_fftFrameSize; k++) {
-                    window = -.5 * cos(2. * M_PI * (double) k / (double) m_fftFrameSize) + .5;
+                    window = -.5 * juce::dsp::FastMathApproximations::cos(2. * M_PI * (double) k / (double) m_fftFrameSize) + .5;
                     m_outputAccumulator[k] += 2. * window * m_fftWorkspace[2 * k] / (fftFrameSize2 * m_oversamplingFactor);
                 }
                 for (k = 0; k < stepSize; k++) m_outFifo[k] = m_outputAccumulator[k];
@@ -375,8 +375,8 @@ namespace SMB {
 	FFT routine, (C)1996 S.M.Bernsee. Sign = -1 is FFT, 1 is iFFT (inverse)
 	Fills fftBuffer[0...2*fftFrameSize-1] with the Fourier transform of the
 	time domain data in fftBuffer[0...2*fftFrameSize-1]. The FFT array takes
-	and returns the cosine and sine parts in an interleaved manner, ie.
-	fftBuffer[0] = cosPart[0], fftBuffer[1] = sinPart[0], asf. fftFrameSize
+	and returns the juce::dsp::FastMathApproximations::costd::sine and std::sine parts in an interleaved manner, ie.
+	fftBuffer[0] = juce::dsp::FastMathApproximations::cosPart[0], fftBuffer[1] = std::sinPart[0], asf. fftFrameSize
 	must be a power of 2. It expects a complex input signal (see footnote 2),
 	ie. when working with 'common' audio signals our input signal has to be
 	passed as {in[0],0.,in[1],0.,in[2],0.,...} asf. In that case, the transform
@@ -409,8 +409,8 @@ namespace SMB {
             ur = 1.0;
             ui = 0.0;
             arg = M_PI / (le2 >> 1);
-            wr = cos(arg);
-            wi = sign * sin(arg);
+            wr = juce::dsp::FastMathApproximations::cos(arg);
+            wi = sign * std::sin(arg);
             for (j = 0; j < le2; j += 2) {
                 p1r = fftBuffer + j;
                 p1i = p1r + 1;
