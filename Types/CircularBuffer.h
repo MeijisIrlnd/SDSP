@@ -38,11 +38,35 @@ namespace SDSP
 
         CircularBuffer<T>() : interpolationTimeMs(500) { }
 
+        CircularBuffer<T>(const CircularBuffer<T>& other) : interpolationTimeMs(other.interpolationTimeMs), m_sampleRate(other.m_sampleRate) {
+
+        }
+
+        CircularBuffer<T>(CircularBuffer<T>&& other) noexcept : interpolationTimeMs(other.interpolationTimeMs), m_sampleRate(other.m_sampleRate) {
+
+        }
+
         ~CircularBuffer()
         {
             if (buffer != nullptr) {
                 delete[] buffer;
             }
+        }
+
+        CircularBuffer<T>& operator=(const CircularBuffer<T>& other) {
+            if(&other != this) {
+                interpolationTimeMs = other.interpolationTimeMs;
+                m_sampleRate = other.m_sampleRate;
+                m_maxDelaySeconds = other.m_maxDelaySeconds;
+            }
+            return *this;
+        }
+
+        CircularBuffer<T>& operator=(CircularBuffer<T>&& other) noexcept {
+            interpolationTimeMs = other.interpolationTimeMs;
+            m_sampleRate = other.m_sampleRate;
+            m_maxDelaySeconds = other.m_maxDelaySeconds;
+            return *this;
         }
         
         // REFACTOR: what the fuck hahah

@@ -1,6 +1,7 @@
 #include <juce_dsp/juce_dsp.h> 
 #include <unordered_map>
 #include <functional>
+#include "../Macros.h"
 namespace SDSP 
 { 
     class LFO 
