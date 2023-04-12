@@ -20,6 +20,7 @@ namespace SDSP::Oscillators
         SQUARE,
         WHITE_NOISE,
         PINK_NOISE,
+        CUSTOM,
     };
 
     class SDSPOscillator
@@ -30,6 +31,13 @@ namespace SDSP::Oscillators
         }
 
         SDSPOscillator(bool blep, SHAPE shape) : m_blep(blep), m_currentShape(shape) {
+
+        }
+
+        explicit SDSPOscillator(std::function<float(float)> customFunction)
+            : m_customFunction(std::move(customFunction))
+            , m_currentShape(SHAPE::CUSTOM)
+        {
 
         }
 
@@ -78,6 +86,10 @@ namespace SDSP::Oscillators
                     x = m_pinkingFilter.processSample(juce::jmap<float>(juce::Random::getSystemRandom().nextFloat(), 0.0f, 1.0f, -1.0f, 1.0f));
                     break;
                 }
+                case SHAPE::CUSTOM: {
+                    x = m_customFunction(m_phase);
+                    break;
+                }
             }
             incrementPhase();
             return x;
@@ -88,6 +100,11 @@ namespace SDSP::Oscillators
             m_prevYn = 0.0f;
         }
 
+        [[maybe_unused]] SDSP_INLINE void setShape(std::function<float(float)> function) {
+            m_currentShape = SHAPE::CUSTOM;
+            m_customFunction = std::move(function);
+        }
+
         [[maybe_unused]] SDSP_INLINE void setFrequency(float newFrequency) noexcept {
             m_frequency = newFrequency;
             m_phaseIncrement = m_frequency / static_cast<float>(m_sampleRate);
@@ -95,6 +112,10 @@ namespace SDSP::Oscillators
 
         [[maybe_unused]] SDSP_INLINE void retrigger() noexcept {
             m_phase = 0.0f;
+        }
+
+        [[maybe_unused]] SDSP_INLINE void setPhase(float phase) noexcept {
+            m_phase = phase;
         }
 
     private:
@@ -112,5 +133,6 @@ namespace SDSP::Oscillators
         float m_prevYn{ 0.0f };
 
         BiquadCascade<1> m_pinkingFilter;
+        std::function<float(float)> m_customFunction;
     };
 }
