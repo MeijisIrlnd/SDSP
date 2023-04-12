@@ -10,13 +10,15 @@ namespace SDSP
             SINE
         };
         
-        LFO(const LFO_SHAPE& shape) { 
+        explicit LFO(const LFO_SHAPE& shape) {
             m_oscillator.initialise(m_lookup[shape]);
         }
-        
-        ~LFO() { 
 
+        explicit LFO(const std::function<float(float)>& shape) {
+            m_oscillator.initialise(shape);
         }
+
+
 
         void prepareToPlay(int samplesPerBlockExpected, double sampleRate) { 
             m_oscillator.prepare({sampleRate, static_cast<juce::uint32>(samplesPerBlockExpected), 2});
@@ -38,6 +40,15 @@ namespace SDSP
                 m_oscillator.setFrequency(newFrequency);
             }
         }
+
+        [[maybe_unused]] SDSP_INLINE void setShape(LFO_SHAPE newShape) {
+            m_oscillator.initialise(m_lookup[newShape]);
+        }
+
+        [[maybe_unused]] SDSP_INLINE void setShape(const std::function<float(float)>& newShape) {
+            m_oscillator.initialise(newShape);
+        }
+
     private:
         bool m_hasBeenPrepared{ false };
         float m_frequency{5.0f};
