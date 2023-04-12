@@ -4,6 +4,7 @@
 #pragma once
 #include <cmath>
 #include <juce_core/juce_core.h>
+#include "../KMath.h"
 #include "../Macros.h"
 namespace SDSP::Oscillators
 {
@@ -21,6 +22,11 @@ namespace SDSP::Oscillators
         explicit SDSPOscillator(bool blep) : m_blep(blep) {
 
         }
+
+        SDSPOscillator(bool blep, SHAPE shape) : m_blep(blep), m_currentShape(shape) {
+
+        }
+
         void prepareToPlay(int /*samplesPerBlockExpected*/, double sampleRate)
         {
             m_sampleRate = sampleRate;
