@@ -45,8 +45,8 @@ namespace SDSP::RBJ
             const double omega = juce::MathConstants<double>::twoPi * (centreFreq / sampleRate);
             const double cosOmega = std::cos(omega);
             const double sinOmega = std::sin(omega);
-            const double A = KMath::fastPow(10, dbGain / 40.0);
-            const double twoRootAa = sinOmega * KMath::fastPow((KMath::fastPow(A, 2) + 1) * ((1 / slope) - 1) + 2 * A, 0.5);
+            const double A = std::pow(10, dbGain / 40.0);
+            const double twoRootAa = sinOmega * std::pow((std::pow(A, 2) + 1) * ((1 / slope) - 1) + 2 * A, 0.5);
             target[0] = A * ((A + 1) - (A - 1) * cosOmega + twoRootAa); // a0
             target[1] = (2 * A) * ((A - 1) - (A + 1) * cosOmega); // a1
             target[2] = A * ((A + 1) - (A - 1) * cosOmega - twoRootAa); // a2
@@ -60,8 +60,8 @@ namespace SDSP::RBJ
             const double omega = juce::MathConstants<double>::twoPi * (centreFreq / sampleRate);
             const double cosOmega = std::cos(omega);
             const double sinOmega = std::sin(omega);
-            const double A = KMath::fastPow(10, dbGain / 40.0);
-            const double twoRootAa = sinOmega * KMath::fastPow((KMath::fastPow(A, 2) + 1) * ((1 / slope) - 1) + 2 * A, 0.5);
+            const double A = std::pow(10, dbGain / 40.0);
+            const double twoRootAa = sinOmega * std::pow((std::pow(A, 2) + 1) * ((1 / slope) - 1) + 2 * A, 0.5);
             target[0] = A * ((A + 1) + (A - 1) * cosOmega + twoRootAa); // a0
             target[1] = (-2 * A) * ((A - 1) + (A + 1) * cosOmega); // a1
             target[2] = A * ((A + 1) + (A - 1) * cosOmega - twoRootAa); // a2

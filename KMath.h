@@ -9,6 +9,7 @@
 */
 
 #pragma once
+#include <vector>
 #include <inttypes.h>
 #include <cmath>
 #include "Macros.h"
@@ -16,54 +17,32 @@ namespace SDSP
 {
     namespace KMath
     {
-        SDSP_UNUSED static float fastLog2(float val) {
-            //union { float val; int32_t x; } u = { val };
-            //register float log2 = static_cast<float>(((u.x >> 23) & 255) - 128);
-            //u.x &= ~(255 << 23);
-            //u.x += 127 << 23;
-            //log2 += ((-0.3358287811f) * u.val + 2.0f) * u.val - 0.65871759316667f;
-            //return log2;
-            return std::log2f(val);
-        }
-
-       SDSP_UNUSED static double fastPow(double a, double b) {
-            //union {
-            //    double d;
-            //    int x[2];
-            //} u = { a };
-            //u.x[1] = static_cast<int>(b * (u.x[1] - 1072632447) + 1072632447);
-            //u.x[0] = 0;
-            //return u.d;
-            return std::pow(a, b);
-        }
-
-        template<typename T, typename U>
-        SDSP_UNUSED constexpr double dmod(T x, U mod) {
-            return !mod ? x : x - mod * static_cast<long long>(x / mod);
-        }
-
         template<typename T> 
         SDSP_UNUSED static T Lerp(T start, T end, float distance)
         {
+            distance = distance > 1 ? 1 : distance;
+            distance = distance < 0 ? 0 : distance;
             return static_cast<T>(start + (end - start) * distance);
         }
 
         template<typename T>
         SDSP_UNUSED static inline T log(T x, T base) {
-            
+            if(x == 0) throw std::out_of_range("Log of 0");
+            if(base == 0) return 0;
             auto logA = std::log2(x);
             auto logB = std::log2(base);
             return logA / logB;
         }
+
         SDSP_UNUSED static inline bool isPrime(int x) {
-            for(int i = 3; i < std::sqrt(x); i += 2) {
-                if(x % i == 0) {
-                    return false;
-                }
+            if(x < 2) return false;
+            for(auto i = 2; i <= x / 2; ++i) {
+                if(x % i == 0) return false;
             }
             return true;
         }
 
+        // Is this actually just nearest prime?
         SDSP_UNUSED static inline float getNearestCoprime(float toCheck)
         {
             int above = std::ceil(toCheck);
@@ -104,11 +83,16 @@ namespace SDSP
             499, 503, 509, 521, 523, 541
         };
 
-        SDSP_UNUSED static inline float nearestPrime(float p_i, float M_i) {
-            auto m_i = std::roundf(std::logf(M_i) / std::logf(p_i));
-            return std::powf(p_i, m_i);
+        [[maybe_unused]] [[nodiscard]] static inline float nearestPrime(float source) {
+            if(source < 2) return 2;
+            auto res = source;
+            while(!isPrime(static_cast<int>(res))) {
+                --res;
+            }
+            return res;
         }
 
+        // TODO: UNIT TEST ME
         [[maybe_unused]] [[nodiscard]] static inline double polyBlep(double t, double phaseIncrement) noexcept {
             // this gets you out of radians, we're already out of radians, with 0 to 1 phase
             //double dt = phaseIncrement / juce::MathConstants<float>::twoPi;
