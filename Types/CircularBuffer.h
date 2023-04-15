@@ -110,8 +110,13 @@ namespace SDSP
         }
         void setDelay(int m)
         {
+            m = m < 0 ? 0 : m;
+            m = m > m_maxDelaySeconds * m_sampleRate ? static_cast<int>(m_maxDelaySeconds * m_sampleRate) : m;
+            m_delaySamples = m;
             interpolator.set(m, interpolationTimeMs);
         }
+
+        [[maybe_unused]] [[nodiscard]] int getDelay() const { return m_delaySamples; }
 
         SDSP_UNUSED void setInterpolationRate(double interpTimeMs)
         {
@@ -121,7 +126,12 @@ namespace SDSP
         inline T getNextSample(T in)
         {
             std::scoped_lock<std::mutex> sl(m_mutex);
-            recordHead = playbackHead - (int)interpolator.process();
+            if(interpolationTimeMs != 0) {
+                recordHead = playbackHead - (int) interpolator.process();
+            }
+            else {
+                recordHead = playbackHead - m_delaySamples;
+            }
             while (recordHead < buffer) {
                 recordHead += bufferSize;
             }
@@ -148,6 +158,7 @@ namespace SDSP
         size_t bufferSize{};
         int interpolationTimeMs = 500;
         double m_maxDelaySeconds{5};
+        int m_delaySamples{ 0 };
 
     };
 }

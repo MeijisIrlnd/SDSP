@@ -27,7 +27,7 @@ namespace SDSP
 
         template<typename T>
         SDSP_UNUSED static inline T log(T x, T base) {
-            if(x == 0) throw std::out_of_range("Log of 0");
+            if(x == 0) throw std::exception();
             if(base == 0) return 0;
             auto logA = std::log2(x);
             auto logB = std::log2(base);

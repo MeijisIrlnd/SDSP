@@ -55,6 +55,8 @@ namespace SDSP
             set(startValue, target, timeMs);
         }
 
+
+        // TODO: Handle timeMs = 0
         void set(T start, T target, double timeMs)
         {
             startValue = start;
@@ -62,6 +64,7 @@ namespace SDSP
             totalTicks = static_cast<juce::uint64>(samplesPerMs * timeMs);
             remainingTicks = totalTicks;
             currentValue = startValue;
+            // div by 0..
             increment = (targetValue - startValue) / (double)totalTicks;
             running = true;
         }
