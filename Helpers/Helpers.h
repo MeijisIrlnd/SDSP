@@ -3,6 +3,7 @@
 // Potentially not that useful, but nice drop ins to try and avoid using std::mem stuff directly
 //
 #pragma once
+#include "../Macros.h"
 #include <array>
 #include <concepts>
 namespace SDSP::Helpers
@@ -29,6 +30,6 @@ namespace SDSP::Helpers
 
     template<typename T> requires NumericArray<T>
     SDSP_UNUSED static inline void fill_array(T& dest, typename T::value_type value) {
-        std::memset(dest.data(), value, sizeof(typename T::value_type) * dest.size());
+        std::fill(dest.begin(), dest.end(), value);
     }
 }
