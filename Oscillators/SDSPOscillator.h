@@ -1,4 +1,4 @@
-//
+    //
 // Created by Syl on 15/03/2023.
 //
 #pragma once
@@ -138,6 +138,10 @@ namespace SDSP::Oscillators
 
         [[maybe_unused]] SDSP_INLINE void setPhase(float phase) noexcept {
             m_phase = phase;
+        }
+
+        [[maybe_unused]] [[nodiscard]] SDSP_INLINE float getPhase() const noexcept {
+            return m_phase;
         }
 
         // incoming value expect to be in range 0 - pi

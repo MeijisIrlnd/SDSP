@@ -22,7 +22,7 @@ namespace SDSP
     {
     public:
         LineRamp<T>() = default;
-        virtual ~LineRamp() {}
+        virtual ~LineRamp() = default;
         void prepare(double sampleRate)
         {
             samplesPerMs = sampleRate / 1000.0;
@@ -59,13 +59,21 @@ namespace SDSP
         // TODO: Handle timeMs = 0
         void set(T start, T target, double timeMs)
         {
+            timeMs = timeMs < 0 ? 0 : timeMs;
             startValue = start;
             targetValue = target;
             totalTicks = static_cast<juce::uint64>(samplesPerMs * timeMs);
             remainingTicks = totalTicks;
             currentValue = startValue;
-            // div by 0..
-            increment = (targetValue - startValue) / (double)totalTicks;
+
+            if(timeMs == 0) {
+                increment = 0;
+                currentValue = target;
+                remainingTicks = 0;
+            }
+            else {
+                increment = (targetValue - startValue) / (double) totalTicks;
+            }
             running = true;
         }
 
