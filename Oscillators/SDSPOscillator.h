@@ -58,7 +58,7 @@ namespace SDSP::Oscillators
                    break;
                 }
                 case SHAPE::TRI: {
-                    x = std::asin(std::sin(offsetPhase* juce::MathConstants<float>::twoPi));
+                    x = std::asin(std::sin(offsetPhase * juce::MathConstants<float>::twoPi));
                     x /= juce::MathConstants<float>::halfPi;
                     // blep wise, this behaves as a square, but with a bit extra.. (which I dont fully get yet)
                     break;

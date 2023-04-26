@@ -40,7 +40,5 @@ namespace SDSP::Testing
             REQUIRE(testCircularBufferIR(100));
             REQUIRE(testCircularBufferIR(512));
         }
-
-
     }
 }
