@@ -45,8 +45,8 @@ namespace SDSP
         // Is this actually just nearest prime?
         SDSP_UNUSED static inline float getNearestCoprime(float toCheck)
         {
-            int above = std::ceil(toCheck);
-            int below = std::floor(toCheck);
+            int above = std::ceil(static_cast<int>(toCheck));
+            int below = std::floor(static_cast<int>(toCheck));
             if(above <= 2) {
                 return 2;
             }
