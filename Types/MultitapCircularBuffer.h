@@ -68,6 +68,10 @@ namespace SDSP
                 }
             }
 
+            void clearBuffers() {
+                std::fill(m_buffer.begin(), m_buffer.end(), 0.0f);
+            }
+
         private:
             bool m_hasBeenPrepared{false};
             double m_sampleRate{};

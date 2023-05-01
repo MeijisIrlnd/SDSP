@@ -46,6 +46,12 @@ namespace SDSP
                 m_buffers[i].setDelay(static_cast<int>(timeSamples / std::pow(2, i)));
             }
         }
+
+        void clearBuffers() {
+            for(auto& b : m_buffers) {
+                b.clear();
+            }
+        }
     private:
 
         float test = 0;
