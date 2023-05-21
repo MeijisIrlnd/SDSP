@@ -9,7 +9,7 @@
 */
 
 #pragma once
-
+#include <array>
 namespace SDSP
 {
     template<int NSTAGES>
