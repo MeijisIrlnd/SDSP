@@ -48,6 +48,7 @@ namespace SDSP::Oscillators
         }
 
         float processSample() noexcept {
+            if(m_phaseIncrement == 0.0f) return 0.0f;
             float x = 0.0f;
             float offsetPhase = std::fmod(m_phase + m_offset, 1.0f);
 
@@ -117,6 +118,7 @@ namespace SDSP::Oscillators
             m_currentShape = s;
         }
 
+        [[maybe_unused]] [[nodiscard]] SDSP_INLINE SHAPE getShape() const { return m_currentShape; }
         [[maybe_unused]] SDSP_INLINE void setFunction(OscFunction function) {
             m_tempFunction = std::move(function);
             m_currentShape = SHAPE::CUSTOM;
@@ -146,6 +148,11 @@ namespace SDSP::Oscillators
         // incoming value expect to be in range 0 - pi
         [[maybe_unused]] SDSP_INLINE void setOffset(float offset) noexcept {
             m_offset = juce::jmap(offset, 0.0f, juce::MathConstants<float>::pi, 0.0f, 1.0f);
+        }
+
+        // DANGER
+        SDSP_INLINE void setPhaseIncrement(float newPhaseIncrement) {
+            m_phaseIncrement = newPhaseIncrement;
         }
 
     private:
