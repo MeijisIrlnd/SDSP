@@ -6,13 +6,10 @@
 #include <array>
 namespace SDSP
 {
-    class CascadingCircularBuffer
+    class [[maybe_unused]] CascadingCircularBuffer
     {
     public:
-        CascadingCircularBuffer()
-        {
-
-        }
+        CascadingCircularBuffer() = default;
 
         CascadingCircularBuffer(const CascadingCircularBuffer& other) = default;
 

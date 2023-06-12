@@ -4,7 +4,7 @@
 #pragma once
 namespace SDSP::Filters
 {
-    class SinglePoleLowpass
+    class [[maybe_unused]] SinglePoleLowpass
     {
     public:
 

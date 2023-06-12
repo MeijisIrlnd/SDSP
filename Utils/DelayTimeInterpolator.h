@@ -6,7 +6,11 @@
 #include "../Helpers/Helpers.h"
 namespace SDSP
 {
+#if __cplusplus >= 202002L
     template<typename ArrayType> requires Helpers::NumericArray<ArrayType>
+# else
+    template<typename ArrayType>
+#endif
     struct SDSP_UNUSED DelayTimeInterpolator
     {
         DelayTimeInterpolator() {

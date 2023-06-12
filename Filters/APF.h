@@ -6,19 +6,19 @@
 #include <juce_dsp/juce_dsp.h>
 namespace SDSP::Filters
 {
-    class APFBase {
+    class [[maybe_unused]] APFBase {
     public:
         [[maybe_unused]] float tap(const int index) {
             return m_delayLine.popSample(0, static_cast<float>(index), false);
         }
-        virtual void setDelayTimeSamples(int newDelayTimeSamples) {
+        [[maybe_unused]] virtual void setDelayTimeSamples(int newDelayTimeSamples) {
             m_delayTimeSamples = newDelayTimeSamples;
             if(m_hasBeenPrepared) {
                 m_delayLine.setDelay(static_cast<float>(m_delayTimeSamples));
             }
         }
 
-        void setCoeff(float newCoeff) {
+        [[maybe_unused]] void setCoeff(float newCoeff) {
             m_coeff = newCoeff;
             if(m_hasBeenPrepared) {
                 m_smoothedCoeff.setTargetValue(m_coeff);
@@ -46,7 +46,6 @@ namespace SDSP::Filters
 
     protected:
         double m_sampleRate{ 44100 };
-        float m_prev{ 0.0f };
         bool m_hasBeenPrepared{ false };
         int m_delayTimeSamples{ 0 };
         juce::dsp::DelayLine<float> m_delayLine;
@@ -54,7 +53,7 @@ namespace SDSP::Filters
         juce::SmoothedValue<float> m_smoothedCoeff;
     };
 
-    class APF : public APFBase {
+    class [[maybe_unused]] APF : public APFBase {
     public:
         float processSample(float in) override
         {
@@ -66,14 +65,14 @@ namespace SDSP::Filters
         }
     };
 
-    class ModulatedAPF : public APFBase {
+    class [[maybe_unused]] ModulatedAPF : public APFBase {
     public:
 
-        void setLfoRate(const float newRate) noexcept {
+        [[maybe_unused]] void setLfoRate(const float newRate) noexcept {
             m_lfo.setFrequency(newRate);
         }
 
-        void setExcursionSeconds(float newExcursionSeconds) {
+        [[maybe_unused]] void setExcursionSeconds(float newExcursionSeconds) {
             m_excursionSeconds = newExcursionSeconds;
         }
 
@@ -120,7 +119,7 @@ namespace SDSP::Filters
         juce::SmoothedValue<float> m_smoothedDelayTimeSamples;
     };
 
-    class APF2ndOrder {
+    class [[maybe_unused]] APF2ndOrder {
     public:
         [[maybe_unused]] float tap(const int index) {
             return m_delayLine.popSample(0, static_cast<float>(index), false);
@@ -143,14 +142,14 @@ namespace SDSP::Filters
             return out + feedforward;
         }
 
-        void setDelayTimeSamples(int newDelayTimeSamples) {
+        [[maybe_unused]] void setDelayTimeSamples(int newDelayTimeSamples) {
             m_delayTimeSamples = newDelayTimeSamples;
             if(m_hasBeenPrepared) {
                 m_delayLine.setDelay(static_cast<float>(m_delayTimeSamples));
             }
         }
 
-        void setCoeff(float newCoeff) {
+        [[maybe_unused]] void setCoeff(float newCoeff) {
             m_coeff = newCoeff;
         }
 

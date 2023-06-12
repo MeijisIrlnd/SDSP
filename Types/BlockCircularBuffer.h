@@ -1,12 +1,13 @@
 #pragma once 
 #include <juce_core/juce_core.h>
+#include <juce_audio_basics/juce_audio_basics.h>
 #include "../Macros.h"
 namespace SDSP 
 { 
     // Mostly lifted from here: https://github.com/stekyne/PhaseVocoder/blob/master/DSP/BlockCircularBuffer.h
     // No license was provided, but please do check out his github https://github.com/stekyne
     template <typename T>
-    class BlockCircularBuffer
+    class [[maybe_unused]] BlockCircularBuffer
     {
     public:
         BlockCircularBuffer() = default;

@@ -38,7 +38,7 @@ namespace SDSP
         return res;
     }
 
-    class BiQuadDelay
+    class [[maybe_unused]] BiQuadDelay
     {
     public:
         BiQuadDelay() = default;
@@ -55,7 +55,7 @@ namespace SDSP
 
     };
 
-    class Biquad
+    class [[maybe_unused]] Biquad
     {
     public:
         Biquad(const uint32_t numSections, SDSP_UNUSED const uint32_t maxFramesPerSlice) : m_numSections(numSections)
@@ -125,7 +125,7 @@ namespace SDSP
     };
     
     template<int N>
-    class BiquadCascade
+    class [[maybe_unused]] BiquadCascade
     {
     public: 
         BiquadCascade() {

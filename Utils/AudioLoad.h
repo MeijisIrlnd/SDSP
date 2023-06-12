@@ -1,5 +1,6 @@
 #pragma once 
 #include <juce_core/juce_core.h>
+#include <juce_audio_formats/juce_audio_formats.h>
 #include "Resampling.h"
 #include "../Macros.h"
 namespace SDSP::Utils 

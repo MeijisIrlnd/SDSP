@@ -8,7 +8,7 @@
 #include "../Filters/DSPBiquad.h"
 #include "../Filters/SmoothedFilterCoefficients.h"
 namespace SDSP {
-    class OrnsteinUlenbech {
+    class [[maybe_unused]] OrnsteinUlenbech {
     public:
         OrnsteinUlenbech() : m_noiseGen(false, Oscillators::SHAPE::WHITE_NOISE) {
 

@@ -13,7 +13,7 @@
 namespace SDSP
 {
     template<int NSTAGES>
-    struct SmoothedFilterCoefficients
+    struct [[maybe_unused]] SmoothedFilterCoefficients
     {
         std::array<std::array<double, 6>, NSTAGES> currents;
         std::array<std::array<double, 6>, NSTAGES> targets;
