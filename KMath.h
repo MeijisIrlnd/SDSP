@@ -16,9 +16,9 @@
     #include <melatonin_perfetto/melatonin_perfetto.h>
 #endif
 
-#if defined(HAS_IPP)
-    #include <ippvm.h>
-    #include <type_traits>
+#if defined(FAST_MATH)
+// Keep this around for when we inevitably want to increase perf...
+    #include <fastmaths/pow.hpp>
 #endif
 #include "Macros.h"
 namespace SDSP::KMath
@@ -123,38 +123,9 @@ namespace SDSP::KMath
 #endif
     }
 
-    template<typename T>
-    [[maybe_unused]] [[nodiscard]] static T pow(T x, T y) {
-#if PERFETTO
-        TRACE_DSP("x", x, "y", y);
-#endif
-#if defined(HAS_IPP)
-        if constexpr(std::is_same<T, float>::value) {
-            auto ippX = static_cast<Ipp32f>(x);
-            auto ippY = static_cast<Ipp32f>(y);
-            Ipp32f res{ 0.0f };
-            // todo.. this can fail...
-            auto status = ippsPow_32f_A21(&ippX, &ippY, &res, 1);
-            return res;
-        }
-        else if constexpr(std::is_same<T, double>::value){
-            auto ippX = static_cast<Ipp64f>(x);
-            auto ippY = static_cast<Ipp64f>(y);
-            Ipp64f res{ 0.0 };
-            // todo.. this can also fail..
-            auto status = ippsPow_64f_A50(&ippX, &ippY,&res, 1);
-            return res;
-        }
-        else {
-            return std::pow(x, y);
-        }
-#else
-        return std::pow(x, y);
-#endif
-    }
 
     template <typename Type>
-    static Type decibelsToGain (Type decibels, Type minusInfinityDb = Type(-100))
+    [[maybe_unused]] [[nodiscard]] static Type decibelsToGain (Type decibels, Type minusInfinityDb = Type(-100))
     {
         return decibels > minusInfinityDb ? pow<Type>(static_cast<Type>(10.0), decibels * static_cast<Type>(0.05)) : Type();
     }
