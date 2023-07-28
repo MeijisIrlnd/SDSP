@@ -3,6 +3,7 @@
 //
 #pragma once
 
+#include "OscillatorShape.h"
 #include "../Filters/DSPBiquad.h"
 #include "../Filters/FilterHelpers.h"
 #include "../Macros.h"
@@ -13,16 +14,6 @@
 
 namespace SDSP::Oscillators
 {
-    enum class SHAPE {
-        SINE,
-        SAW,
-        SQUARE,
-        TRI,
-        PULSE,
-        WHITE_NOISE,
-        PINK_NOISE,
-        CUSTOM,
-    };
 
     class [[maybe_unused]] SDSPOscillator
     {
@@ -47,10 +38,10 @@ namespace SDSP::Oscillators
             m_pinkingFilter.setCoefficients(SDSP::Filters::pinking().data());
         }
 
-        float processSample() noexcept {
+        float processSample(float instantaneousOffset = 0.0f) noexcept {
             if(m_phaseIncrement == 0.0f) return 0.0f;
             float x = 0.0f;
-            float offsetPhase = std::fmod(m_phase + m_offset, 1.0f);
+            float offsetPhase = std::fmod(m_phase + m_offset + instantaneousOffset, 1.0f);
 
             switch (m_currentShape) {
                 case SHAPE::SINE: {

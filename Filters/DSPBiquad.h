@@ -26,13 +26,13 @@ namespace SDSP
         if constexpr(N % 2 == 0) {
             // First pole is poleSpacing /  2 radians from the real axis
             for (auto i = 0; i < N / 2; i++) {
-                res[i] = 1 / (2 * juce::dsp::FastMathApproximations::cos<double>((poleSpacing / 2.0) + (i * poleSpacing)));
+                res[static_cast<size_t>(i)] = 1 / (2 * juce::dsp::FastMathApproximations::cos<double>((poleSpacing / 2.0) + (i * poleSpacing)));
             }
         }
         else {
             for (auto i = 0; i < N / 2; i++) {
                 // spacing + i * spacing right? 
-                res[i] = 1 / (2 * juce::dsp::FastMathApproximations::cos<double>(poleSpacing + (i * poleSpacing)));
+                res[static_cast<size_t>(i)] = 1 / (2 * juce::dsp::FastMathApproximations::cos<double>(poleSpacing + (i * poleSpacing)));
             }
         }
         return res;
@@ -136,7 +136,7 @@ namespace SDSP
         }
 
         float processSample(float in) {
-            for (auto i = 0; i < N; i++) {
+            for (size_t i = 0; i < N; i++) {
               m_biquads[i].template processSample<1>(&in, &in);
             }
             return in;
@@ -144,12 +144,12 @@ namespace SDSP
 
         void setCoefficients(double* coeffs, int stage) {
             if (stage < N) {
-                m_biquads[stage].initialise(coeffs);
+                m_biquads[static_cast<size_t>(stage)].initialise(coeffs);
             }
         }
 
         void setCoefficients(double* coeffs) {
-            for (auto i = 0; i < N; i++) {
+            for (size_t i = 0; i < N; i++) {
                 m_biquads[i].initialise(coeffs);
             }
         }
