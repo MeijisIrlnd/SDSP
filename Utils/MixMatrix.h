@@ -9,6 +9,9 @@ namespace SDSP
 		static constexpr Sample multiplier{ -2.0 / size };
 	public:
 		static void inPlace(Sample* arr) {
+#if PERFETTO
+            TRACE_DSP();
+#endif
 			Sample sum = 0;
 			for (int i = 0; i < size; ++i) {
 				sum += arr[i];
@@ -25,6 +28,9 @@ namespace SDSP
 	class [[maybe_unused]] Hadamard {
 	public:
 		static inline void recursiveUnscaled(Sample* data) {
+#if PERFETTO
+            TRACE_DSP();
+#endif
 			if constexpr (size <= 1) return;
 			constexpr int hSize = size / 2;
 			// Two (unscaled) Hadamards of half the size
