@@ -7,6 +7,9 @@
 #include "OscillatorShape.h"
 #include "SDSPOscillator.h"
 #include <functional>
+#if PERFETTO
+    #include <melatonin_perfetto/melatonin_perfetto.h>
+#endif
 namespace SDSP::Oscillators {
     template<size_t NumPoints, SHAPE Shape>
     class [[maybe_unused]] SDSPWavetable {
@@ -27,6 +30,9 @@ namespace SDSP::Oscillators {
         }
 
         [[nodiscard]] float processSample() noexcept {
+#if PERFETTO
+            TRACE_DSP();
+#endif
             // Aw shit here we go again
             auto idx0 = static_cast<size_t>(m_currentIndex);
             auto idx1 = idx0 + 1;

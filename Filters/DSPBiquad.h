@@ -43,6 +43,9 @@ namespace SDSP
     public:
         BiQuadDelay() = default;
         BiQuadDelay(const BiQuadDelay& other) = default;
+        BiQuadDelay(BiQuadDelay&& other) noexcept = default;
+        BiQuadDelay& operator=(const BiQuadDelay& other) = default;
+        BiQuadDelay& operator=(BiQuadDelay&& other) = default;
 
         float mX_z1;
         float mX_z2;
@@ -60,8 +63,10 @@ namespace SDSP
     public:
         Biquad(const uint32_t numSections, SDSP_UNUSED const uint32_t maxFramesPerSlice) : m_numSections(numSections)
         {
+            m_coefficients.resize(6 * m_numSections);
             m_biquadDelays.resize(m_numSections);
-            m_coefficients = std::vector<float>(m_numSections * 6, 0.0);
+            juce::FloatVectorOperations::fill(m_coefficients.data(), 0.0, m_coefficients.size());
+            /*m_coefficients = std::vector<double>(m_numSections * 6, 0.0);*/
             for (uint32_t sec = 0; sec < numSections; sec++) {
                 m_coefficients.at(0 + 6 * sec) = 1.0;
             }
@@ -73,10 +78,11 @@ namespace SDSP
             reset();
         }
 
-        void initialise(const double* coeffs) {
-            for (uint32_t i = 0; i < m_numSections * 6; i++) {
+        void initialise(const double* coeffs) noexcept {
+            juce::FloatVectorOperations::copy(m_coefficients.data(), coeffs, 6);
+/*            for (uint32_t i = 0; i < m_numSections * 6; i++) {
                 m_coefficients[i] = static_cast<float>(coeffs[i]);
-            }
+            }*/
         }
 
         template<int NumFrames>
@@ -92,13 +98,13 @@ namespace SDSP
                 for (uint32_t sec = 0; sec < m_numSections; sec++) {
                     uint32_t offset = sec * 5;
                     BiQuadDelay* del = &m_biquadDelays[sec];
-                    float y = 1 / m_coefficients[offset + 3] * ( // b0
+                    auto y = static_cast<float>(1 / m_coefficients[offset + 3] * ( // b0
                         m_coefficients[offset] * sectionInput + // a0
                         m_coefficients[offset + 1] * del->mX_z1 + // a1
                         m_coefficients[offset + 2] * del->mX_z2 - // a2
                         m_coefficients[offset + 4] * del->mY_z1 - // b1
                         m_coefficients[offset + 5] * del->mY_z2  // b2
-                        );
+                        ));
                     del->mX_z2 = del->mX_z1;
                     del->mX_z1 = sectionInput;
                     del->mY_z2 = del->mY_z1;
@@ -111,15 +117,18 @@ namespace SDSP
         }
         void reset()
         {
-            for (uint32_t i = 0; i < m_numSections; i++) {
-                m_biquadDelays.at(i).reset();
+            for(auto& d : m_biquadDelays) {
+                d.reset();
             }
+/*            for (uint32_t i = 0; i < m_numSections; i++) {
+                m_biquadDelays.at(i).reset();
+            }*/
         }
         SDSP_UNUSED SDSP_NODISCARD uint32_t getNumSections() const { return m_numSections; }
     private:
         uint32_t m_numSections;
         std::vector<BiQuadDelay> m_biquadDelays;
-        std::vector<float> m_coefficients;
+        std::vector<double> m_coefficients;
     private:
 
     };
@@ -143,9 +152,7 @@ namespace SDSP
         }
 
         void setCoefficients(double* coeffs, int stage) {
-            if (stage < N) {
-                m_biquads[static_cast<size_t>(stage)].initialise(coeffs);
-            }
+            m_biquads[static_cast<size_t>(stage)].initialise(coeffs);
         }
 
         void setCoefficients(double* coeffs) {

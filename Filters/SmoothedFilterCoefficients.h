@@ -21,11 +21,11 @@ namespace SDSP
 
         std::array<std::array<double, 6>, NSTAGES> currents;
         std::array<std::array<double, 6>, NSTAGES> targets;
-        double* current(int stage) {
+        [[nodiscard]] double* current(int stage) {
             return currents[static_cast<size_t>(stage)].data();
         }
 
-        double* target(int stage) {
+        [[nodiscard]] double* target(int stage) {
             return targets[static_cast<size_t>(stage)].data();
         }
 
