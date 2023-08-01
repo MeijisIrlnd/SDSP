@@ -13,22 +13,26 @@
 namespace SDSP
 {
     template<int NSTAGES>
-    struct SmoothedFilterCoefficients
+    struct [[maybe_unused]] SmoothedFilterCoefficients
     {
+    private:
+        std::array<double, 6> m_temp;
+    public:
+
         std::array<std::array<double, 6>, NSTAGES> currents;
         std::array<std::array<double, 6>, NSTAGES> targets;
-        double* current(int stage) {
-            return currents[stage].data();
+        [[nodiscard]] double* current(int stage) {
+            return currents[static_cast<size_t>(stage)].data();
         }
 
-        double* target(int stage) {
-            return targets[stage].data();
+        [[nodiscard]] double* target(int stage) {
+            return targets[static_cast<size_t>(stage)].data();
         }
 
         void interpolate()
         {
-            for (auto stage = 0; stage < NSTAGES; stage++) {
-                for (auto i = 0; i < 6; i++) {
+            for(size_t stage = 0; stage < NSTAGES; stage++) {
+                for (size_t i = 0; i < 6; i++) {
                     currents[stage][i] = currents[stage][i] - 0.004 * (currents[stage][i] - targets[stage][i]);
                 }
             }

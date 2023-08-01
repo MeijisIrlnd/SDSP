@@ -8,10 +8,10 @@
 #include <SDSP/Oscillators/SDSPOscillator.h>
 namespace SDSP
 {
-    class BlendableLFO
+    class [[maybe_unused]] BlendableLFO
     {
     public:
-        BlendableLFO() = default;
+        BlendableLFO() : m_osc1(true), m_osc2(true) { }
 
         BlendableLFO(SDSP::Oscillators::SHAPE shape1, SDSP::Oscillators::SHAPE shape2) : m_osc1(true), m_osc2(true) {
             m_osc1.setShape(shape1);

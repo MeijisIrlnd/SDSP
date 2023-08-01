@@ -23,7 +23,7 @@ namespace SDSP
     /// </summary>
     /// <typeparam name="T"></typeparam>
     template <typename T>
-    class CircularBuffer
+    class [[maybe_unused]] CircularBuffer
     {
     public:
 
@@ -52,9 +52,7 @@ namespace SDSP
 
         ~CircularBuffer()
         {
-            if (buffer != nullptr) {
-                delete[] buffer;
-            }
+            delete[] buffer;
         }
 
         CircularBuffer<T>& operator=(const CircularBuffer<T>& other) {
@@ -79,7 +77,7 @@ namespace SDSP
             m_sampleRate = sampleRate;
             bufferSize = static_cast<size_t>(m_maxDelaySeconds * sampleRate);
 
-            if (buffer != nullptr) { delete[] buffer; }
+            delete[] buffer;
             buffer = new T[bufferSize];
             std::memset(buffer, 0, bufferSize * sizeof(T));
             
@@ -94,7 +92,7 @@ namespace SDSP
             std::scoped_lock<std::mutex> sl(m_mutex);
             m_maxDelaySeconds = maxDelaySeconds;
             bufferSize = m_maxDelaySeconds * m_sampleRate;
-            if (buffer != nullptr) { delete[] buffer; }
+            delete[] buffer;
             buffer = new T[static_cast<size_t>(bufferSize)];
             std::memset(buffer, 0, bufferSize * sizeof(T));
             recordHead = buffer;
@@ -123,7 +121,7 @@ namespace SDSP
             interpolationTimeMs = static_cast<int>(interpTimeMs);
         }
 
-        inline T getNextSample(T in)
+        SDSP_INLINE T getNextSample(T in)
         {
             std::scoped_lock<std::mutex> sl(m_mutex);
             if(interpolationTimeMs != 0) {

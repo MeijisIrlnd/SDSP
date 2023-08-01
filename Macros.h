@@ -14,3 +14,11 @@
 #ifndef SDSP_NODISCARD
 #define SDSP_NODISCARD [[nodiscard]]
 #endif
+
+#ifndef SDSP_NOINLINE
+#ifdef _MSC_VER
+#define SDSP_NOINLINE __declspec(noinline)
+#else
+#define SDSP_NOINLINE __attribute__((noinline))
+#endif
+#endif
