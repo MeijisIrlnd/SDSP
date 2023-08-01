@@ -88,6 +88,11 @@ namespace SMB {
             m_sampleRate = sampleRate;
         }
 
+        float processSample2(float x) noexcept {
+            auto out = {0.0f};
+
+        }
+
         float processSample(float x) noexcept {
             auto out{ 0.0f };
             double magn, phase, tmp, window, real, imag;
@@ -114,7 +119,7 @@ namespace SMB {
 
                 /* do windowing and re,im interleave */
                 for (k = 0; k < m_fftFrameSize; k++) {
-                    window = -.5 * juce::dsp::FastMathApproximations::cos(2. * M_PI * (double) k / (double) m_fftFrameSize) + .5;
+                    window = -.5 * std::cos(2. * M_PI * (double) k / (double) m_fftFrameSize) + .5;
                     m_fftWorkspace[2 * k] = m_inFifo[k] * window;
                     m_fftWorkspace[2 * k + 1] = 0.;
                 }
@@ -198,7 +203,7 @@ namespace SMB {
                     phase = m_sumPhase[k];
 
                     /* get real and imag part and re-interleave */
-                    m_fftWorkspace[2 * k] = magn * juce::dsp::FastMathApproximations::cos(phase);
+                    m_fftWorkspace[2 * k] = magn * std::cos(phase);
                     m_fftWorkspace[2 * k + 1] = magn * std::sin(phase);
                 }
 
@@ -210,7 +215,7 @@ namespace SMB {
 
                 /* do windowing and add to output accumulator */
                 for (k = 0; k < m_fftFrameSize; k++) {
-                    window = -.5 * juce::dsp::FastMathApproximations::cos(2. * M_PI * (double) k / (double) m_fftFrameSize) + .5;
+                    window = -.5 * std::cos(2. * M_PI * (double) k / (double) m_fftFrameSize) + .5;
                     m_outputAccumulator[k] += 2. * window * m_fftWorkspace[2 * k] / (fftFrameSize2 * m_oversamplingFactor);
                 }
                 for (k = 0; k < stepSize; k++) m_outFifo[k] = m_outputAccumulator[k];
@@ -253,7 +258,7 @@ namespace SMB {
                 // could remove this and use Signalsmith's windowed fft class instead..
                 /* do windowing and re,im interleave */
                 for (k = 0; k < m_fftFrameSize; k++) {
-                    window = -.5 * juce::dsp::FastMathApproximations::cos(2. * M_PI * (double) k / (double) m_fftFrameSize) + .5;
+                    window = -.5 * std::cos(2. * M_PI * (double) k / (double) m_fftFrameSize) + .5;
                     m_fftWorkspace[2 * k] = m_inFifo[k] * window;
                     m_fftWorkspace[2 * k + 1] = 0.;
                 }
@@ -333,8 +338,8 @@ namespace SMB {
 
                     /* get real and imag part and re-interleave */
                     // don't fucking reinterleave lmaooo
-                    m_spectrum[k] = { static_cast<float>(magn * juce::dsp::FastMathApproximations::cos(phase)), static_cast<float>(magn * std::sin(phase)) };
-                    //m_fftWorkspace[2 * k] = magn * juce::dsp::FastMathApproximations::cos(phase);
+                    m_spectrum[k] = { static_cast<float>(magn * std::cos(phase)), static_cast<float>(magn * std::sin(phase)) };
+                    //m_fftWorkspace[2 * k] = magn * std::cos(phase);
                     //m_fftWorkspace[2 * k + 1] = magn * std::sin(phase);
                 }
 
@@ -345,7 +350,7 @@ namespace SMB {
 
                 /* do windowing and add to output accumulator */
                 for (k = 0; k < m_fftFrameSize; k++) {
-                    window = -.5 * juce::dsp::FastMathApproximations::cos(2. * M_PI * (double) k / (double) m_fftFrameSize) + .5;
+                    window = -.5 * std::cos(2. * M_PI * (double) k / (double) m_fftFrameSize) + .5;
                     m_outputAccumulator[k] += 2. * window * m_fftWorkspace[2 * k] / (fftFrameSize2 * m_oversamplingFactor);
                 }
                 for (k = 0; k < stepSize; k++) m_outFifo[k] = m_outputAccumulator[k];
@@ -375,8 +380,8 @@ namespace SMB {
 	FFT routine, (C)1996 S.M.Bernsee. Sign = -1 is FFT, 1 is iFFT (inverse)
 	Fills fftBuffer[0...2*fftFrameSize-1] with the Fourier transform of the
 	time domain data in fftBuffer[0...2*fftFrameSize-1]. The FFT array takes
-	and returns the juce::dsp::FastMathApproximations::costd::sine and std::sine parts in an interleaved manner, ie.
-	fftBuffer[0] = juce::dsp::FastMathApproximations::cosPart[0], fftBuffer[1] = std::sinPart[0], asf. fftFrameSize
+	and returns the std::costd::sine and std::sine parts in an interleaved manner, ie.
+	fftBuffer[0] = std::cosPart[0], fftBuffer[1] = std::sinPart[0], asf. fftFrameSize
 	must be a power of 2. It expects a complex input signal (see footnote 2),
 	ie. when working with 'common' audio signals our input signal has to be
 	passed as {in[0],0.,in[1],0.,in[2],0.,...} asf. In that case, the transform
@@ -409,7 +414,7 @@ namespace SMB {
             ur = 1.0;
             ui = 0.0;
             arg = M_PI / (le2 >> 1);
-            wr = juce::dsp::FastMathApproximations::cos(arg);
+            wr = std::cos(arg);
             wi = sign * std::sin(arg);
             for (j = 0; j < le2; j += 2) {
                 p1r = fftBuffer + j;

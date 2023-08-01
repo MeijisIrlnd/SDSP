@@ -12,6 +12,14 @@
 #include <vector>
 #include <cinttypes>
 #include <cmath>
+#if PERFETTO
+    #include <melatonin_perfetto/melatonin_perfetto.h>
+#endif
+
+#if defined(FAST_MATH)
+// Keep this around for when we inevitably want to increase perf...
+    #include <fastmaths/pow.hpp>
+#endif
 #include "Macros.h"
 namespace SDSP::KMath
 {
@@ -105,5 +113,20 @@ namespace SDSP::KMath
         }
         return 0;
 
+    }
+
+    [[maybe_unused]] [[nodiscard]] static bool usingIPP() {
+#if defined(HAS_IPP)
+        return true;
+#else
+        return false;
+#endif
+    }
+
+
+    template <typename Type>
+    [[maybe_unused]] [[nodiscard]] static Type decibelsToGain (Type decibels, Type minusInfinityDb = Type(-100))
+    {
+        return decibels > minusInfinityDb ? pow<Type>(static_cast<Type>(10.0), decibels * static_cast<Type>(0.05)) : Type();
     }
 }
