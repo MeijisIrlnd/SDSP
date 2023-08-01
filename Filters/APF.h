@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include "../Oscillators/SDSPOscillator.h"
 #include <juce_dsp/juce_dsp.h>
 namespace SDSP::Filters
 {
@@ -44,6 +45,8 @@ namespace SDSP::Filters
 
         }
 
+        virtual void clearBuffers() noexcept = 0;
+
     protected:
         double m_sampleRate{ 44100 };
         bool m_hasBeenPrepared{ false };
@@ -63,10 +66,17 @@ namespace SDSP::Filters
             auto feedforward = in * m_coeff;
             return (delayed + feedforward);
         }
+
+        void clearBuffers() noexcept override {
+            m_delayLine.reset();
+        }
     };
 
     class [[maybe_unused]] ModulatedAPF : public APFBase {
     public:
+        ModulatedAPF() : m_lfo(false) {
+            m_lfo.setShape(Oscillators::SHAPE::SINE);
+        }
 
         [[maybe_unused]] void setLfoRate(const float newRate) noexcept {
             m_lfo.setFrequency(newRate);
@@ -80,15 +90,14 @@ namespace SDSP::Filters
         {
             APFBase::prepareToPlay(samplesPerBlockExpected, sampleRate);
             juce::dsp::ProcessSpec spec{sampleRate / static_cast<double>(m_updateRate), static_cast<juce::uint32>(samplesPerBlockExpected), 1};
-            m_lfo.prepare(spec);
-            m_lfo.initialise([](float x) { return std::sinf(x); });
+            m_lfo.prepareToPlay(samplesPerBlockExpected, sampleRate);
             m_smoothedDelayTimeSamples.reset(sampleRate, 0.1);
             m_smoothedDelayTimeSamples.setCurrentAndTargetValue(static_cast<float>(m_delayTimeSamples));
         }
 
         float processSample(float in) override {
             if(m_samplesUntilUpdate == 0) {
-                auto lfoSample = m_lfo.processSample(0);
+                auto lfoSample = m_lfo.processSample();
                 auto excursionSamples = static_cast<float>(m_excursionSeconds * m_sampleRate);
                 lfoSample = juce::jmap<float>(lfoSample, -1, 1, -excursionSamples, excursionSamples);
                 auto newDelayTime = (static_cast<float>(m_delayTimeSamples) + lfoSample);
@@ -111,11 +120,18 @@ namespace SDSP::Filters
             auto feedforward = in * m_coeff;
             return (delayed + feedforward);
         }
+
+        void clearBuffers() noexcept override {
+            m_delayLine.reset();
+            m_lfo.setPhase(0.0f);
+            m_samplesUntilUpdate = 0;
+        }
+
     private:
         const int m_updateRate{ 100 };
         int m_samplesUntilUpdate{ 0 };
         float m_excursionSeconds{ 0.0f };
-        juce::dsp::Oscillator<float> m_lfo;
+        SDSP::Oscillators::SDSPOscillator m_lfo;
         juce::SmoothedValue<float> m_smoothedDelayTimeSamples;
     };
 

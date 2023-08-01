@@ -22,6 +22,10 @@ namespace SDSP::Filters
             return current;
         }
 
+        void reset() {
+            m_x1 = 0.0f;
+        }
+
 
     private:
         float m_x1{ 0.0f };
