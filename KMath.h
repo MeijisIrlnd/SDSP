@@ -13,7 +13,7 @@
 #include <cinttypes>
 #include <cmath>
 #if PERFETTO
-    #include <melatonin_perfetto/melatonin_perfetto.h>
+    /*#include <melatonin_perfetto/melatonin_perfetto.h>*/
 #endif
 
 #if defined(FAST_MATH)
