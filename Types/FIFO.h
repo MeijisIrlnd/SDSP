@@ -17,7 +17,7 @@ namespace SDSP {
             m_buffer.emplace_back(toPush);
         }
 
-        [[nodiscard]] SDSP_INLINE float pop(long long offset = 0, bool erase = true) noexcept {
+        [[nodiscard]] SDSP_INLINE float pop(std::ptrdiff_t offset = 0, bool erase = true) noexcept {
             if(m_buffer.empty()) return 0.0f;
             auto it = m_buffer.begin() + offset;
             if(it == m_buffer.end()) return 0.0f;
