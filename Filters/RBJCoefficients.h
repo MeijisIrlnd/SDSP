@@ -135,6 +135,22 @@ namespace SDSP::RBJ
             target[5] = 1 - (alpha / A);
         }
 
+        SDSP_UNUSED static inline void bellWithQ(double* target, double sampleRate, double gainDb, double centreFreq, double q) {
+            const auto A = std::pow(10, gainDb / 40.0);
+            const auto omega = juce::MathConstants<double>::twoPi * (centreFreq / sampleRate);
+            const auto sinOmega = std::sin(omega);
+            const auto cosOmega = std::cos(omega);
+            const auto alpha = sinOmega / (2.0 * q);
+            const auto alphaA = alpha * A;
+            const auto alphaOverA = alpha / A;
+            target[0] = 1 + alphaA;
+            target[1] = -2 * cosOmega;
+            target[2] = 1 - alphaA;
+            target[3] = 1 + alphaOverA;
+            target[4] = target[1];
+            target[5] = 1 - alphaOverA;
+        }
+
         SDSP_UNUSED static inline void allpass(double* target, double sampleRate, double centreFrequency, double Q)
         {
             const auto omega = juce::MathConstants<double>::twoPi * (centreFrequency / sampleRate);
