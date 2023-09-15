@@ -7,7 +7,7 @@
 #include <SDSP/KMath.h>
 #include <span.hpp>
 #include <cmath>
-#include <gcem/include/gcem.hpp>
+#include <gcem.hpp>
 namespace SDSP::Filters {
     enum class SVF_TYPE {
         HIGHPASS,
