@@ -15,7 +15,7 @@ namespace SDSP
                 std::fill(m_buffer.begin(), m_buffer.end(), 0.0f);
                 std::fill(m_read.begin(), m_read.end(), 0.0f);
                 for(auto tap = 0; tap < NTAPS; tap++) { 
-                    m_smoothedDelayTimes[tap].reset(sampleRate, 0.1f);
+                    m_smoothedDelayTimes[tap].reset(sampleRate, 0.5f);
                     m_smoothedDelayTimes[tap].setCurrentAndTargetValue(m_delayTimes[tap]);
                 }
                 m_hasBeenPrepared = true;
@@ -30,8 +30,8 @@ namespace SDSP
 
                 m_buffer[m_write] = x;
                 for(auto tap = 0; tap < NTAPS; tap++) { 
-                    //m_read[tap] = m_write - m_smoothedDelayTimes[tap].getNextValue();
-                    m_read[tap] = m_write - m_delayTimes[tap];
+                    m_read[tap] = m_write - m_smoothedDelayTimes[tap].getNextValue();
+                    //m_read[tap] = m_write - m_delayTimes[tap];
                     while(m_read[tap] < 0) { 
                         m_read[tap] += m_buffer.size();
                     }

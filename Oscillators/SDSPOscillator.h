@@ -53,6 +53,7 @@ namespace SDSP::Oscillators
         }
 
         [[maybe_unused]] SDSP_INLINE void setShape(SHAPE s) {
+            if(m_currentShape == s) return;
             m_currentShape = s;
         }
 
