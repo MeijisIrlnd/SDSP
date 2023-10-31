@@ -5,7 +5,7 @@
 #include <juce_audio_basics/juce_audio_basics.h>
 namespace SDSP
 {
-    struct BufferWithSampleRate
+    struct [[maybe_unused]] BufferWithSampleRate
     {
         BufferWithSampleRate() = default;
         BufferWithSampleRate(juce::AudioBuffer<float>&& buffer, double sampleRate) :
@@ -14,7 +14,7 @@ namespace SDSP
         double m_sampleRate = 0.0;
     };
 
-    class BufferTransfer
+    class [[maybe_unused]] BufferTransfer
     {
     public:
         void set(BufferWithSampleRate&& buffer) {

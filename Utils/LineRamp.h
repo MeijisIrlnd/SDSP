@@ -18,7 +18,7 @@ namespace SDSP
     /// </summary>
     /// <typeparam name="T"></typeparam>
     template <typename T>
-    class LineRamp
+    class [[maybe_unused]] LineRamp
     {
     public:
         LineRamp<T>() = default;
@@ -86,10 +86,10 @@ namespace SDSP
     protected:
         SDSP_UNUSED bool running{false};
         T currentValue = 0.0;
-        double samplesPerMs;
-        juce::uint64 remainingTicks;
-        juce::uint64 totalTicks;
-        double increment;
+        double samplesPerMs{};
+        juce::uint64 remainingTicks{};
+        juce::uint64 totalTicks{};
+        double increment{};
         T targetValue;
         T startValue;
     };

@@ -3,6 +3,7 @@
 //
 #pragma once
 
+#include "OscillatorShape.h"
 #include "../Filters/DSPBiquad.h"
 #include "../Filters/FilterHelpers.h"
 #include "../Macros.h"
@@ -13,32 +14,22 @@
 
 namespace SDSP::Oscillators
 {
-    enum class SHAPE {
-        SINE,
-        SAW,
-        SQUARE,
-        TRI,
-        PULSE,
-        WHITE_NOISE,
-        PINK_NOISE,
-        CUSTOM,
-    };
 
-    class SDSPOscillator
+    class [[maybe_unused]] SDSPOscillator
     {
     public:
 
         using OscFunction = std::function<float(float)>;
 
-        explicit SDSPOscillator(bool blep) : m_blep(blep) {
+        [[maybe_unused]] explicit SDSPOscillator(bool blep) : m_blep(blep) {
 
         }
 
-        explicit SDSPOscillator(OscFunction function) : m_blep(false), m_customFunction(std::move(function)) {
+        [[maybe_unused]] explicit SDSPOscillator(OscFunction function) : m_blep(false), m_customFunction(std::move(function)) {
 
         }
 
-        SDSPOscillator(bool blep, SHAPE shape) : m_blep(blep), m_currentShape(shape) {
+        [[maybe_unused]] SDSPOscillator(bool blep, SHAPE shape) : m_blep(blep), m_currentShape(shape) {
 
         }
 
@@ -47,9 +38,10 @@ namespace SDSP::Oscillators
             m_pinkingFilter.setCoefficients(SDSP::Filters::pinking().data());
         }
 
-        float processSample() noexcept {
+        float processSample(float instantaneousOffset = 0.0f) noexcept {
+            if(m_phaseIncrement == 0.0f) return 0.0f;
             float x = 0.0f;
-            float offsetPhase = std::fmod(m_phase + m_offset, 1.0f);
+            float offsetPhase = std::fmod(m_phase + m_offset + instantaneousOffset, 1.0f);
 
             switch (m_currentShape) {
                 case SHAPE::SINE: {
@@ -115,9 +107,9 @@ namespace SDSP::Oscillators
 
         [[maybe_unused]] SDSP_INLINE void setShape(SHAPE s) {
             m_currentShape = s;
-            m_prevYn = 0.0f;
         }
 
+        [[maybe_unused]] [[nodiscard]] SDSP_INLINE SHAPE getShape() const { return m_currentShape; }
         [[maybe_unused]] SDSP_INLINE void setFunction(OscFunction function) {
             m_tempFunction = std::move(function);
             m_currentShape = SHAPE::CUSTOM;
@@ -149,6 +141,11 @@ namespace SDSP::Oscillators
             m_offset = juce::jmap(offset, 0.0f, juce::MathConstants<float>::pi, 0.0f, 1.0f);
         }
 
+        // DANGER
+        SDSP_INLINE void setPhaseIncrement(float newPhaseIncrement) {
+            m_phaseIncrement = newPhaseIncrement;
+        }
+
     private:
 
         SDSP_INLINE void incrementPhase() noexcept {
@@ -166,7 +163,6 @@ namespace SDSP::Oscillators
         float m_phaseIncrement{ 0.0f };
         float m_offset{ 0.0f };
         float m_frequency{ 0.0f };
-        float m_prevYn{ 0.0f };
         float m_pulseWidth{ 0.5f };
 
         BiquadCascade<1> m_pinkingFilter;

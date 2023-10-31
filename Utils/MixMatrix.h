@@ -5,7 +5,7 @@ namespace SDSP
 {
 	// Use like `Householder<double, 8>::inPlace(data)` - size must be ≥ 1
 	template<typename Sample, int size>
-	class Householder {
+	class [[maybe_unused]] Householder {
 		static constexpr Sample multiplier{ -2.0 / size };
 	public:
 		static void inPlace(Sample* arr) {
@@ -22,7 +22,7 @@ namespace SDSP
 	
 	// Use like `Hadamard<double, 8>::inPlace(data)` - size must be a power of 2
 	template<typename Sample, int size>
-	class Hadamard {
+	class [[maybe_unused]] Hadamard {
 	public:
 		static inline void recursiveUnscaled(Sample* data) {
 			if constexpr (size <= 1) return;
@@ -40,7 +40,7 @@ namespace SDSP
 		}
 		static inline void inPlace(Sample* data) {
 			recursiveUnscaled(data);
-			Sample scalingFactor = static_cast<Sample>(std::sqrt(1.0 / size));
+			auto scalingFactor = static_cast<Sample>(std::sqrt(1.0 / size));
 			for (int c = 0; c < size; ++c) {
 				data[c] *= scalingFactor;
 			}

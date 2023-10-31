@@ -42,4 +42,12 @@ namespace SDSP::Testing {
         REQUIRE(SDSP::KMath::getNearestCoprime(54) == 53);
 
     }
+    TEST_CASE("Test SDSP::usingIPP", "[usingIPP]") {
+        REQUIRE(SDSP::KMath::usingIPP());
+    }
+
+    TEST_CASE("Test SDSP::pow", "[pow]") {
+        REQUIRE(SDSP::KMath::pow<float>(2, 2) == 4.0f);
+        REQUIRE(SDSP::KMath::pow<double>(4, 2) == 16.0);
+    }
 }

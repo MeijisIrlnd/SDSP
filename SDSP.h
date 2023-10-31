@@ -14,7 +14,6 @@ END_JUCE_MODULE_DECLARATION
 
 #include "Macros.h"
 #include "Filters/Filters.h"
-#include "Types/Types.h"
 #include "Utils/Utils.h"
 #include "KMath.h"
 #include "Types/CircularBuffer.h"
