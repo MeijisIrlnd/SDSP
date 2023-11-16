@@ -38,74 +38,22 @@ namespace SDSP::Oscillators
             m_pinkingFilter.setCoefficients(SDSP::Filters::pinking().data());
         }
 
-        float processSample(float instantaneousOffset = 0.0f) noexcept {
+        float processSample(float phase) noexcept {
+            float offsetPhase = std::fmod(phase + m_offset, 1.0f);
+            auto x = processInternal(offsetPhase);
+            return x;
+        }
+
+        float processSample() noexcept {
             if(m_phaseIncrement == 0.0f) return 0.0f;
-            float x = 0.0f;
-            float offsetPhase = std::fmod(m_phase + m_offset + instantaneousOffset, 1.0f);
-
-            switch (m_currentShape) {
-                case SHAPE::SINE: {
-                   x = std::sin(offsetPhase * juce::MathConstants<float>::twoPi);
-                   // No need to blep, sines don't alias..
-                   break;
-                }
-                case SHAPE::TRI: {
-                    x = std::asin(std::sin(offsetPhase * juce::MathConstants<float>::twoPi));
-                    x /= juce::MathConstants<float>::halfPi;
-                    // blep wise, this behaves as a square, but with a bit extra.. (which I dont fully get yet)
-                    break;
-                }
-                case SHAPE::SAW: {
-                    x = (2 * offsetPhase) - 1;
-                    if(m_blep) {
-                        x -= static_cast<float>(KMath::polyBlep(offsetPhase, m_phaseIncrement));
-                    }
-                    break;
-                }
-                case SHAPE::SQUARE: {
-                    if(offsetPhase < 0.5f) x = -1.0f;
-                    else if(offsetPhase > 0.5f) x = 1.0f;
-                    if(m_blep) {
-                        x += static_cast<float>(KMath::polyBlep(offsetPhase, m_phaseIncrement));
-                        x -= static_cast<float>(KMath::polyBlep(std::fmod(offsetPhase + 0.5, 1), m_phaseIncrement));
-                    }
-                    break;
-                }
-                case SHAPE::PULSE: {
-                    if (offsetPhase < m_pulseWidth) {
-                        x = -1.0f;
-                    } else {
-                        x = 1.0f;
-                    }
-
-                    if (m_blep) {
-                        x += static_cast<float>(KMath::polyBlep(offsetPhase, m_phaseIncrement));
-                        x -= static_cast<float>(KMath::polyBlep(std::fmod(offsetPhase + 0.5, 1), m_phaseIncrement));
-                    }
-                    break;
-                }
-                case SHAPE::WHITE_NOISE: {
-                    x = juce::jmap<float>(juce::Random::getSystemRandom().nextFloat(), 0.0f, 1.0f, -1.0f, 1.0f);
-                    break;
-                }
-                case SHAPE::PINK_NOISE: {
-                    x = m_pinkingFilter.processSample(juce::jmap<float>(juce::Random::getSystemRandom().nextFloat(), 0.0f, 1.0f, -1.0f, 1.0f));
-                    break;
-                }
-                case SHAPE::CUSTOM: {
-                    if (m_tempFunction) {
-                        m_customFunction = std::move(*m_tempFunction);
-                        m_tempFunction.reset();
-                    }
-                    x = m_customFunction(offsetPhase);
-                    break;
-                }
-            }
+            float offsetPhase = std::fmod(m_phase + m_offset, 1.0f);
+            auto x = processInternal(offsetPhase);
             incrementPhase();
             return x;
         }
 
         [[maybe_unused]] SDSP_INLINE void setShape(SHAPE s) {
+            if(m_currentShape == s) return;
             m_currentShape = s;
         }
 
@@ -147,6 +95,69 @@ namespace SDSP::Oscillators
         }
 
     private:
+
+        float processInternal(float offsetPhase) noexcept {
+            auto x{ 0.0f };
+            switch (m_currentShape) {
+                case SHAPE::SINE: {
+                   x = std::sin(offsetPhase * juce::MathConstants<float>::twoPi);
+                   // No need to blep, sines don't alias..
+                   break;
+                }
+                case SHAPE::TRI: {
+                    x = std::asin(std::sin(offsetPhase * juce::MathConstants<float>::twoPi));
+                    x /= juce::MathConstants<float>::halfPi;
+                    // blep wise, this behaves as a square, but with a bit extra.. (which I dont fully get yet)
+                    break;
+                }
+                case SHAPE::SAW: {
+                    x = (2 * offsetPhase) - 1;
+                    if(m_blep) {
+                        x -= static_cast<float>(KMath::polyBlep(offsetPhase, m_phaseIncrement));
+                    }
+                    break;
+                }
+                case SHAPE::SQUARE: {
+                    if(offsetPhase < 0.5f) x = 1.0f;
+                    else if(offsetPhase > 0.5f) x = -1.0f;
+                    if(m_blep) {
+                        x += static_cast<float>(KMath::polyBlep(offsetPhase, m_phaseIncrement));
+                        x -= static_cast<float>(KMath::polyBlep(std::fmod(offsetPhase + 0.5, 1), m_phaseIncrement));
+                    }
+                    break;
+                }
+                case SHAPE::PULSE: {
+                    if (offsetPhase < m_pulseWidth) {
+                        x = 1.0f;
+                    } else {
+                        x = -1.0f;
+                    }
+
+                    if (m_blep) {
+                        x += static_cast<float>(KMath::polyBlep(offsetPhase, m_phaseIncrement));
+                        x -= static_cast<float>(KMath::polyBlep(std::fmod(offsetPhase + 0.5, 1), m_phaseIncrement));
+                    }
+                    break;
+                }
+                case SHAPE::WHITE_NOISE: {
+                    x = juce::jmap<float>(juce::Random::getSystemRandom().nextFloat(), 0.0f, 1.0f, -1.0f, 1.0f);
+                    break;
+                }
+                case SHAPE::PINK_NOISE: {
+                    x = m_pinkingFilter.processSample(juce::jmap<float>(juce::Random::getSystemRandom().nextFloat(), 0.0f, 1.0f, -1.0f, 1.0f));
+                    break;
+                }
+                case SHAPE::CUSTOM: {
+                    if (m_tempFunction) {
+                        m_customFunction = std::move(*m_tempFunction);
+                        m_tempFunction.reset();
+                    }
+                    x = m_customFunction(offsetPhase);
+                    break;
+                }
+            }
+            return x;
+        }
 
         SDSP_INLINE void incrementPhase() noexcept {
             m_phase += m_phaseIncrement;
