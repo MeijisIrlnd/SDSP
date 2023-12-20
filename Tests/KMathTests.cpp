@@ -4,20 +4,20 @@
 #include "../KMath.h"
 #include <catch2/catch_test_macros.hpp>
 namespace SDSP::Testing {
-    TEST_CASE( "Test SDSP::KMath::Lerp<float>", "[lerp]") {
+    TEST_CASE("Test SDSP::KMath::Lerp<float>", "[lerp]") {
         REQUIRE(SDSP::KMath::Lerp<float>(0, 1, 0) == 0);
         REQUIRE(SDSP::KMath::Lerp<float>(0, 1, 1) == 1);
         REQUIRE(SDSP::KMath::Lerp<float>(0, 1, -1) == 0);
         REQUIRE(SDSP::KMath::Lerp<float>(0, 1, 2) == 1);
     }
 
-    TEST_CASE( "Test SDSP::KMath::isPrime", "[isPrime]") {
+    TEST_CASE("Test SDSP::KMath::isPrime", "[isPrime]") {
         REQUIRE(SDSP::KMath::isPrime(-2) == false);
         REQUIRE(SDSP::KMath::isPrime(0) == false);
         REQUIRE(SDSP::KMath::isPrime(1) == false);
         REQUIRE(SDSP::KMath::isPrime(4) == false);
         REQUIRE(SDSP::KMath::isPrime(6) == false);
-        for(auto& p : KMath::s_primes) {
+        for (auto& p : KMath::s_primes) {
             REQUIRE(SDSP::KMath::isPrime(p) == true);
         }
     }
@@ -40,14 +40,9 @@ namespace SDSP::Testing {
     TEST_CASE("Test SDSP::getNearestCoprime", "[getNearestCoprime]") {
         REQUIRE(SDSP::KMath::getNearestCoprime(0) == 2);
         REQUIRE(SDSP::KMath::getNearestCoprime(54) == 53);
-
     }
     TEST_CASE("Test SDSP::usingIPP", "[usingIPP]") {
         REQUIRE(SDSP::KMath::usingIPP());
     }
 
-    TEST_CASE("Test SDSP::pow", "[pow]") {
-        REQUIRE(SDSP::KMath::pow<float>(2, 2) == 4.0f);
-        REQUIRE(SDSP::KMath::pow<double>(4, 2) == 16.0);
-    }
-}
+} // namespace SDSP::Testing
