@@ -4,18 +4,18 @@
 #include <catch2/catch_test_macros.hpp>
 #include "../Types/CircularBuffer.h"
 #include <juce_core/juce_core.h>
-namespace SDSP::Testing
-{
+namespace SDSP::Testing {
     bool testCircularBufferIR(int delay) {
-        SDSP::CircularBuffer<float> buffer{0, 44100};
+        SDSP::CircularBuffer<float> buffer{ 0, 44100 };
         buffer.prepare(256, 44100);
         buffer.setDelay(delay);
         std::vector<float> impulse{ 1.0f };
-        for(auto i = delay - 1; delay > 0; --delay) {
+        for (auto i = delay - 1; delay > 0; --delay) {
             impulse.emplace_back(0);
         }
         std::vector<float> res;
-        for(auto& s : impulse) {
+        res.reserve(impulse.size());
+        for (auto& s : impulse) {
             res.emplace_back(buffer.getNextSample(s));
         }
         return res.back() == 1;
@@ -41,4 +41,4 @@ namespace SDSP::Testing
             REQUIRE(testCircularBufferIR(512));
         }
     }
-}
+} // namespace SDSP::Testing
