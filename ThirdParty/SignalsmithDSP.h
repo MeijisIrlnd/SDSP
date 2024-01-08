@@ -277,7 +277,7 @@ namespace signalsmith {
 
             template <bool inverse, typename RandomAccessIterator>
             SIGNALSMITH_INLINE void fftStep3(RandomAccessIterator&& origData, const Step& step) {
-                constexpr complex factor3 = { -0.5, inverse ? 0.8660254037844386 : -0.8660254037844386 };
+                constexpr complex factor3{ static_cast<V>(-0.5), inverse ? static_cast<V>(0.8660254037844386) : static_cast<V>(-0.8660254037844386) };
                 const size_t stride = step.innerRepeats;
                 const complex* origTwiddles = twiddleVector.data() + step.twiddleIndex;
 
@@ -341,18 +341,18 @@ namespace signalsmith {
 
                 for (const Step& step : plan) {
                     switch (step.type) {
-                    case StepType::generic:
-                        fftStepGeneric<inverse>(data + step.startIndex, step);
-                        break;
-                    case StepType::step2:
-                        fftStep2<inverse>(data + step.startIndex, step);
-                        break;
-                    case StepType::step3:
-                        fftStep3<inverse>(data + step.startIndex, step);
-                        break;
-                    case StepType::step4:
-                        fftStep4<inverse>(data + step.startIndex, step);
-                        break;
+                        case StepType::generic:
+                            fftStepGeneric<inverse>(data + step.startIndex, step);
+                            break;
+                        case StepType::step2:
+                            fftStep2<inverse>(data + step.startIndex, step);
+                            break;
+                        case StepType::step3:
+                            fftStep3<inverse>(data + step.startIndex, step);
+                            break;
+                        case StepType::step4:
+                            fftStep4<inverse>(data + step.startIndex, step);
+                            break;
                     }
                 }
             }
@@ -484,7 +484,8 @@ namespace signalsmith {
                 size_t hhSize = size / 4 + 1;
                 twiddlesMinusI.resize(hhSize);
                 for (size_t i = 0; i < hhSize; ++i) {
-                    V rotPhase = -2 * M_PI * (modified ? i + 0.5 : i) / size;
+                    V rotPhase = static_cast<V>(-2.0 * M_PI * (modified ? static_cast<double>(i) + 0.5 : static_cast<double>(i)) / static_cast<double>(size));
+                    // V rotPhase = -2 * M_PI * (modified ? i + 0.5 : i) / size;
                     twiddlesMinusI[i] = { std::sin(rotPhase), -std::cos(rotPhase) };
                 }
                 if (modified) {

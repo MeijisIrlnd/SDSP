@@ -9,7 +9,7 @@ namespace SDSP::Filters {
         float frequencyMultiplier, q;
     };
     static const std::array<std::vector<BesselFilterConfig>, 4> s_besselFilterConfigs = {
-        std::vector<BesselFilterConfig>{ BesselFilterConfig{ 1.27201964951f, 0.57735026919 } },
+        std::vector<BesselFilterConfig>{ BesselFilterConfig{ 1.27201964951f, 0.57735026919f } },
         std::vector<BesselFilterConfig>{ BesselFilterConfig{ 1.60335751622f, 0.805538281842f }, BesselFilterConfig{ 1.43017155999f, 0.521934581669f } },
         std::vector<BesselFilterConfig>{ BesselFilterConfig{ 1.9047076123f, 1.02331395383f }, BesselFilterConfig{ 1.68916826762f, 0.611194546878f }, BesselFilterConfig{ 1.60391912877f, 0.510317824749f } },
         std::vector<BesselFilterConfig>{ BesselFilterConfig{ 2.18872623053f, 1.22566942541f }, BesselFilterConfig{ 1.95319575902f, 0.710852074442f }, BesselFilterConfig{ 1.8320926012f, 0.559609164796f }, BesselFilterConfig{ 1.77846591177f, 0.505991069397f } }

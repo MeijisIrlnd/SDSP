@@ -41,7 +41,7 @@ namespace SDSP::Signalsmith::Envelopes {
                 result += wrapJump;
                 readIndex += bufferLength;
             }
-            return result - buffer[readIndex];
+            return static_cast<Sample>(result) - buffer[readIndex];
         }
 
         void write(Sample value) {
