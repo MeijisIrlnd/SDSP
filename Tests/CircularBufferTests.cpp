@@ -10,7 +10,7 @@ namespace SDSP::Testing {
         buffer.prepare(256, 44100);
         buffer.setDelay(delay);
         std::vector<float> impulse{ 1.0f };
-        for (auto i = delay - 1; delay > 0; --delay) {
+        for (; delay > 0; --delay) {
             impulse.emplace_back(0);
         }
         std::vector<float> res;

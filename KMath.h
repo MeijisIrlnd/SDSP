@@ -76,7 +76,7 @@ namespace SDSP::KMath {
                 break;
             }
         }
-        return static_cast<int>(deltaAbove < deltaBelow ? above : below);
+        return static_cast<float>(deltaAbove < deltaBelow ? above : below);
     }
 
     static inline std::vector<float> s_primes = {
