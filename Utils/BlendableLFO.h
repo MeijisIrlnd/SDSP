@@ -54,7 +54,6 @@ namespace SDSP
         }
 
     private:
-        double m_sampleRate{ 44100 };
         float m_blendPos{ 0.0f };
         float m_rate{ 0.01f };
         std::function<float(float)> m_generator1, m_generator2;

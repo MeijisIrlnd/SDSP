@@ -21,11 +21,11 @@ namespace SDSP {
 
         std::array<float, NTAPS> processSample(float x) {
             juce::FloatVectorOperations::fill(m_output.data(), 0.0f, NTAPS);
-            while (m_write >= m_buffer.size()) {
+            while (m_write >= static_cast<int>(m_buffer.size())) {
                 m_write -= static_cast<int>(m_buffer.size());
             }
 
-            m_buffer[m_write] = x;
+            m_buffer[static_cast<size_t>(m_write)] = x;
             for (size_t tap = 0; tap < static_cast<size_t>(NTAPS); ++tap) {
                 m_read[tap] = m_write - static_cast<int>(m_smoothedDelayTimes[tap].getNextValue());
                 // m_read[tap] = m_write - m_delayTimes[tap];
@@ -35,7 +35,7 @@ namespace SDSP {
                 // while(m_read[tap] < m_buffer.size()) {
                 //     m_read[tap] += m_buffer.size();
                 // }
-                m_output[tap] = m_buffer[m_read[tap]];
+                m_output[tap] = m_buffer[static_cast<size_t>(m_read[tap])];
                 ++m_read[tap];
                 if (m_read[tap] >= static_cast<int>(m_buffer.size()) - 1) {
                     m_read[tap] -= static_cast<int>(m_buffer.size());
@@ -58,9 +58,10 @@ namespace SDSP {
         }
 
         void setDelayTime(int delayTime, int tap) {
-            m_delayTimes[tap] = delayTime;
+            const auto szTap{ static_cast<size_t>(tap) };
+            m_delayTimes[szTap] = delayTime;
             if (m_hasBeenPrepared) {
-                m_smoothedDelayTimes[tap].setTargetValue(static_cast<float>(delayTime));
+                m_smoothedDelayTimes[szTap].setTargetValue(static_cast<float>(delayTime));
             }
         }
 

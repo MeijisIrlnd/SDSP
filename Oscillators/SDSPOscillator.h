@@ -25,11 +25,11 @@ namespace SDSP::Oscillators
 
         }
 
-        [[maybe_unused]] explicit SDSPOscillator(OscFunction function) : m_blep(false), m_customFunction(std::move(function)) {
+        [[maybe_unused]] explicit SDSPOscillator(OscFunction function) : m_customFunction(std::move(function)), m_blep(false) {
 
         }
 
-        [[maybe_unused]] SDSPOscillator(bool blep, SHAPE shape) : m_blep(blep), m_currentShape(shape) {
+        [[maybe_unused]] SDSPOscillator(bool blep, SHAPE shape) : m_currentShape(shape), m_blep(blep) {
 
         }
 

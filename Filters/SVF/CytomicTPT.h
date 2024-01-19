@@ -38,8 +38,6 @@ namespace SDSP::Filters {
                 std::memcpy(scalars.data(), toSet.data(), 3 * sizeof(float));
             }
         } m_coeffs;
-        bool m_hasBeenPrepared{false};
-        double m_sampleRate{};
         float m_ic1Eq{ 0.0f }, m_ic2Eq{ 0.0f };
     };
 }

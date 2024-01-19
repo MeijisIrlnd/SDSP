@@ -194,7 +194,7 @@ namespace SDSP::Filters {
 
         [[nodiscard]] std::array<float, 3>& currentA() noexcept { return m_currentA; }
         [[nodiscard]] std::array<float, 3>& targetA() noexcept { return m_targetA; }
-        [[nodiscard]] std::array<float, 3>& currentScalar() noexcept { return m_currentScalar; };
+        [[nodiscard]] std::array<float, 3>& currentScalar() noexcept { return m_currentScalar; }
         [[nodiscard]] std::array<float, 3>& targetScalar() noexcept { return m_targetScalar; }
 
     private:

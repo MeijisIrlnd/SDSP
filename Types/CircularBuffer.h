@@ -37,10 +37,10 @@ namespace SDSP {
 
         CircularBuffer<T>() : interpolationTimeMs(500) {}
 
-        CircularBuffer<T>(const CircularBuffer<T>& other) : interpolationTimeMs(other.interpolationTimeMs), m_sampleRate(other.m_sampleRate) {
+        CircularBuffer<T>(const CircularBuffer<T>& other) :  m_sampleRate(other.m_sampleRate), interpolationTimeMs(other.interpolationTimeMs) {
         }
 
-        CircularBuffer<T>(CircularBuffer<T>&& other) noexcept : interpolationTimeMs(other.interpolationTimeMs), m_sampleRate(other.m_sampleRate) {
+        CircularBuffer<T>(CircularBuffer<T>&& other) noexcept :  m_sampleRate(other.m_sampleRate), interpolationTimeMs(other.interpolationTimeMs) {
         }
 
         ~CircularBuffer() {

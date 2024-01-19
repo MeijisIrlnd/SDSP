@@ -89,7 +89,6 @@ namespace SDSP::Filters
         void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override
         {
             APFBase::prepareToPlay(samplesPerBlockExpected, sampleRate);
-            juce::dsp::ProcessSpec spec{sampleRate / static_cast<double>(m_updateRate), static_cast<juce::uint32>(samplesPerBlockExpected), 1};
             m_lfo.prepareToPlay(samplesPerBlockExpected, sampleRate);
             m_smoothedDelayTimeSamples.reset(sampleRate, 0.1);
             m_smoothedDelayTimeSamples.setCurrentAndTargetValue(static_cast<float>(m_delayTimeSamples));

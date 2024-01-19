@@ -21,7 +21,6 @@ namespace SDSP {
     };
 
     // Use like `Hadamard<double, 8>::inPlace(data)` - size must be a power of 2
-#pragma warning(push, 0)
     template <typename Sample, int size>
     class [[maybe_unused]] Hadamard {
     public:
@@ -50,5 +49,4 @@ namespace SDSP {
             }
         }
     };
-#pragma warning(pop)
 } // namespace SDSP
