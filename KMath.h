@@ -48,6 +48,7 @@ namespace SDSP::KMath {
 
     // Is this actually just nearest prime?
     SDSP_UNUSED static inline float getNearestCoprime(float toCheck) {
+        const auto dToCheck{ static_cast<double>(toCheck)};
         auto above = static_cast<int>(std::ceil(toCheck));
         auto below = static_cast<int>(std::floor(toCheck));
         if (above <= 2) {
@@ -67,14 +68,22 @@ namespace SDSP::KMath {
         ;
         for (;; above += 2, below -= 2) {
             if (isPrime(below)) {
-                deltaBelow = toCheck - below;
+                deltaBelow = dToCheck - static_cast<double>(below);
             }
             if (isPrime(above)) {
-                deltaAbove = above - toCheck;
+                deltaAbove = static_cast<double>(above) - dToCheck;
             }
+            const auto diffAbv{ std::numeric_limits<double>::max() - std::abs(deltaAbove) };
+            const auto diffBelow{ std::numeric_limits<double>::max() - std::abs(deltaBelow)};
+            const auto epsilon{ std::numeric_limits<double>::min() };
+            if(diffAbv > epsilon || diffBelow > epsilon) {
+                break;
+            }
+/*
             if (deltaAbove != std::numeric_limits<double>::max() || deltaBelow != std::numeric_limits<double>::max()) {
                 break;
             }
+*/
         }
         return static_cast<float>(deltaAbove < deltaBelow ? above : below);
     }
