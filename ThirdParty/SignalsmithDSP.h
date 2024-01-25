@@ -1,4 +1,5 @@
 #pragma once
+#pragma warning(push, 0)
 #include <complex>
 #include <cmath>
 #include <vector>
@@ -10,14 +11,14 @@
 namespace signalsmith {
     // Perf.h
     namespace perf {
-/**	@defgroup Performance Performance helpers
-        @brief Nothing serious, just some `#defines` and helpers
+        /**	@defgroup Performance Performance helpers
+                @brief Nothing serious, just some `#defines` and helpers
 
-        @{
-        @file
-*/
+                @{
+                @file
+        */
 
-/// *Really* insist that a function/method is inlined (mostly for performance in DEBUG builds)
+        /// *Really* insist that a function/method is inlined (mostly for performance in DEBUG builds)
 #ifndef SIGNALSMITH_INLINE
 #ifdef __GNUC__
 #define SIGNALSMITH_INLINE __attribute__((always_inline)) inline
@@ -33,11 +34,12 @@ namespace signalsmith {
         */
         template <bool conjugateSecond = false, typename V>
         SIGNALSMITH_INLINE static std::complex<V> mul(const std::complex<V>& a, const std::complex<V>& b) {
-            return conjugateSecond ? std::complex<V>{
-                b.real() * a.real() + b.imag() * a.imag(),
-                b.real() * a.imag() - b.imag() * a.real()
-            }
-                                   : std::complex<V>{ a.real() * b.real() - a.imag() * b.imag(), a.real() * b.imag() + a.imag() * b.real() };
+            return conjugateSecond
+                       ? std::complex<V>{
+                           b.real() * a.real() + b.imag() * a.imag(),
+                           b.real() * a.imag() - b.imag() * a.real()
+                       }
+                       : std::complex<V>{ a.real() * b.real() - a.imag() * b.imag(), a.real() * b.imag() + a.imag() * b.real() };
         }
     } // namespace perf
 
@@ -56,6 +58,7 @@ namespace signalsmith {
             SIGNALSMITH_INLINE V complexReal(const std::complex<V>& c) {
                 return ((V*)(&c))[0];
             }
+
             template <typename V>
             SIGNALSMITH_INLINE V complexImag(const std::complex<V>& c) {
                 return ((V*)(&c))[1];
@@ -66,22 +69,24 @@ namespace signalsmith {
             SIGNALSMITH_INLINE std::complex<V> complexMul(const std::complex<V>& a, const std::complex<V>& b) {
                 V aReal = complexReal(a), aImag = complexImag(a);
                 V bReal = complexReal(b), bImag = complexImag(b);
-                return conjugateSecond ? std::complex<V>{
-                    bReal * aReal + bImag * aImag,
-                    bReal * aImag - bImag * aReal
-                }
-                                       : std::complex<V>{ aReal * bReal - aImag * bImag, aReal * bImag + aImag * bReal };
+                return conjugateSecond
+                           ? std::complex<V>{
+                               bReal * aReal + bImag * aImag,
+                               bReal * aImag - bImag * aReal
+                           }
+                           : std::complex<V>{ aReal * bReal - aImag * bImag, aReal * bImag + aImag * bReal };
             }
 
             template <bool flipped, typename V>
             SIGNALSMITH_INLINE std::complex<V> complexAddI(const std::complex<V>& a, const std::complex<V>& b) {
                 V aReal = complexReal(a), aImag = complexImag(a);
                 V bReal = complexReal(b), bImag = complexImag(b);
-                return flipped ? std::complex<V>{
-                    aReal + bImag,
-                    aImag - bReal
-                }
-                               : std::complex<V>{ aReal - bImag, aImag + bReal };
+                return flipped
+                           ? std::complex<V>{
+                               aReal + bImag,
+                               aImag - bReal
+                           }
+                           : std::complex<V>{ aReal - bImag, aImag + bReal };
             }
 
             // Use SFINAE to get an iterator from std::begin(), if supported - otherwise assume the value itself is an iterator
@@ -91,6 +96,7 @@ namespace signalsmith {
                     return t;
                 }
             };
+
             template <typename T>
             struct GetIterator<T, decltype((void)std::begin(std::declval<T>()))> {
                 static auto get(const T& t) -> decltype(std::begin(t)) {
@@ -116,6 +122,7 @@ namespace signalsmith {
                 step3,
                 step4
             };
+
             struct Step {
                 StepType type;
                 size_t factor;
@@ -124,6 +131,7 @@ namespace signalsmith {
                 size_t outerRepeats;
                 size_t twiddleIndex;
             };
+
             std::vector<size_t> factors;
             std::vector<Step> plan;
             std::vector<complex> twiddleVector;
@@ -131,6 +139,7 @@ namespace signalsmith {
             struct PermutationPair {
                 size_t from, to;
             };
+
             std::vector<PermutationPair> permutation;
 
             void addPlanSteps(size_t factorIndex, size_t start, size_t length, size_t repeats) {
@@ -179,6 +188,7 @@ namespace signalsmith {
                 }
                 plan.push_back(mainStep);
             }
+
             void setPlan() {
                 factors.resize(0);
                 size_t size = _size, factor = 2;
@@ -341,17 +351,13 @@ namespace signalsmith {
 
                 for (const Step& step : plan) {
                     switch (step.type) {
-                        case StepType::generic:
-                            fftStepGeneric<inverse>(data + step.startIndex, step);
+                        case StepType::generic: fftStepGeneric<inverse>(data + step.startIndex, step);
                             break;
-                        case StepType::step2:
-                            fftStep2<inverse>(data + step.startIndex, step);
+                        case StepType::step2: fftStep2<inverse>(data + step.startIndex, step);
                             break;
-                        case StepType::step3:
-                            fftStep3<inverse>(data + step.startIndex, step);
+                        case StepType::step3: fftStep3<inverse>(data + step.startIndex, step);
                             break;
-                        case StepType::step4:
-                            fftStep4<inverse>(data + step.startIndex, step);
+                        case StepType::step4: fftStep4<inverse>(data + step.startIndex, step);
                             break;
                     }
                 }
@@ -398,6 +404,7 @@ namespace signalsmith {
                 }
                 return power2 * size;
             }
+
             static size_t fastSizeBelow(size_t size) {
                 size_t power2 = 1;
                 while (size >= 32) {
@@ -410,7 +417,8 @@ namespace signalsmith {
                 return power2 * size;
             }
 
-            FFT(size_t size, int fastDirection = 0) : _size(0) {
+            FFT(size_t size, int fastDirection = 0)
+                : _size(0) {
                 if (fastDirection > 0) size = fastSizeAbove(size);
                 if (fastDirection < 0) size = fastSizeBelow(size);
                 this->setSize(size);
@@ -424,12 +432,15 @@ namespace signalsmith {
                 }
                 return _size;
             }
+
             size_t setFastSizeAbove(size_t size) {
                 return setSize(fastSizeAbove(size));
             }
+
             size_t setFastSizeBelow(size_t size) {
                 return setSize(fastSizeBelow(size));
             }
+
             const size_t& size() const {
                 return _size;
             }
@@ -467,11 +478,13 @@ namespace signalsmith {
             static size_t fastSizeAbove(size_t size) {
                 return FFT<V>::fastSizeAbove((size + 1) / 2) * 2;
             }
+
             static size_t fastSizeBelow(size_t size) {
                 return FFT<V>::fastSizeBelow(size / 2) * 2;
             }
 
-            RealFFT(size_t size = 0, int fastDirection = 0) : complexFft(0) {
+            RealFFT(size_t size = 0, int fastDirection = 0)
+                : complexFft(0) {
                 if (fastDirection > 0) size = fastSizeAbove(size);
                 if (fastDirection < 0) size = fastSizeBelow(size);
                 this->setSize(std::max<size_t>(size, 2));
@@ -498,12 +511,15 @@ namespace signalsmith {
 
                 return complexFft.setSize(size / 2);
             }
+
             size_t setFastSizeAbove(size_t size) {
                 return setSize(fastSizeAbove(size));
             }
+
             size_t setFastSizeBelow(size_t size) {
                 return setSize(fastSizeBelow(size));
             }
+
             size_t size() const {
                 return complexFft.size() * 2;
             }
@@ -521,10 +537,11 @@ namespace signalsmith {
 
                 complexFft.fft(complexBuffer1.data(), complexBuffer2.data());
 
-                if (!modified) output[0] = {
-                    complexBuffer2[0].real() + complexBuffer2[0].imag(),
-                    complexBuffer2[0].real() - complexBuffer2[0].imag()
-                };
+                if (!modified)
+                    output[0] = {
+                        complexBuffer2[0].real() + complexBuffer2[0].imag(),
+                        complexBuffer2[0].real() - complexBuffer2[0].imag()
+                    };
                 for (size_t i = modified ? 0 : 1; i <= hSize / 2; ++i) {
                     size_t conjI = modified ? (hSize - 1 - i) : (hSize - i);
 
@@ -540,10 +557,11 @@ namespace signalsmith {
             template <typename InputIterator, typename OutputIterator>
             void ifft(InputIterator&& input, OutputIterator&& output) {
                 size_t hSize = complexFft.size();
-                if (!modified) complexBuffer1[0] = {
-                    input[0].real() + input[0].imag(),
-                    input[0].real() - input[0].imag()
-                };
+                if (!modified)
+                    complexBuffer1[0] = {
+                        input[0].real() + input[0].imag(),
+                        input[0].real() - input[0].imag()
+                    };
                 for (size_t i = modified ? 0 : 1; i <= hSize / 2; ++i) {
                     size_t conjI = modified ? (hSize - 1 - i) : (hSize - i);
                     complex v = input[i], v2 = input[conjI];
@@ -603,6 +621,7 @@ namespace signalsmith {
 
                 return result;
             }
+
             double beta;
             double invB0;
 
@@ -617,7 +636,10 @@ namespace signalsmith {
 
         public:
             /// Set up a Kaiser window with a given shape.  `beta` is `pi*alpha` (since there is ambiguity about shape parameters)
-            Kaiser(double beta) : beta(beta), invB0(1 / bessel0(beta)) {}
+            Kaiser(double beta)
+                : beta(beta),
+                  invB0(1 / bessel0(beta)) {
+            }
 
             /// @name Bandwidth methods
             /// @{
@@ -630,7 +652,8 @@ namespace signalsmith {
             If `heuristicOptimal` is enabled, the main lobe width is _slightly_ wider, improving both the peak and total energy - see `bandwidthToEnergyDb()` and `bandwidthToPeakDb()`.
             \diagram{kaiser-windows-heuristic.svg, The main lobe extends to ±bandwidth/2.} */
             static double bandwidthToBeta(double bandwidth, bool heuristicOptimal = false) {
-                if (heuristicOptimal) { // Heuristic based on numerical search
+                if (heuristicOptimal) {
+                    // Heuristic based on numerical search
                     bandwidth = heuristicBandwidth(bandwidth);
                 }
                 bandwidth = std::max(bandwidth, 2.0);
@@ -642,6 +665,7 @@ namespace signalsmith {
                 double alpha = beta * (1.0 / M_PI);
                 return 2 * std::sqrt(alpha * alpha + 1);
             }
+
             /// @}
 
             /// @name Performance methods
@@ -658,6 +682,7 @@ namespace signalsmith {
                 }
                 return 10.5 + 15 / (bandwidth + 0.4) - 13.25 * bandwidth + (bandwidth < 2) * 13 * (bandwidth - 2);
             }
+
             static double energyDbToBandwidth(double energyDb, bool heuristicOptimal = false) {
                 double bw = 1;
                 while (bw < 20 && bandwidthToEnergyDb(bw, heuristicOptimal) > energyDb) {
@@ -674,6 +699,7 @@ namespace signalsmith {
                 }
                 return bw;
             }
+
             /** @brief Peak ratio (in dB) between side-lobes and the main lobe.
                     \diagram{windows-acg-sidelobe-peaks.svg,Measured main/side lobe peak ratio.  You can see that the heuristic improves performance, except in the bandwidth range 1-2 where peak ratio was sacrificed to improve total energy ratio.}
                     This function uses an approximation which is accurate to ±0.5dB for 2 ⩽ bandwidth ≤ 9, or 0.5 ⩽ bandwidth ≤ 9 when `heuristicOptimal`is enabled.
@@ -685,6 +711,7 @@ namespace signalsmith {
                 }
                 return 10 + 8 / (bandwidth + 2) - 12.75 * bandwidth + (bandwidth < 2) * 4 * (bandwidth - 2);
             }
+
             static double peakDbToBandwidth(double peakDb, bool heuristicOptimal = false) {
                 double bw = 1;
                 while (bw < 20 && bandwidthToPeakDb(bw, heuristicOptimal) > peakDb) {
@@ -701,6 +728,7 @@ namespace signalsmith {
                 }
                 return bw;
             }
+
             /** @} */
 
             /** Equivalent noise bandwidth (ENBW), a measure of frequency resolution.
@@ -747,11 +775,14 @@ namespace signalsmith {
             static double bandwidthToSigma(double bandwidth) {
                 return 0.3 / std::sqrt(bandwidth);
             }
+
             static ApproximateConfinedGaussian withBandwidth(double bandwidth) {
                 return ApproximateConfinedGaussian(bandwidthToSigma(bandwidth));
             }
 
-            ApproximateConfinedGaussian(double sigma) : gaussianFactor(0.0625 / (sigma * sigma)) {}
+            ApproximateConfinedGaussian(double sigma)
+                : gaussianFactor(0.0625 / (sigma * sigma)) {
+            }
 
             /// Fills an arbitrary container
             template <typename Data>
@@ -823,6 +854,7 @@ namespace signalsmith {
             Buffer(int minCapacity = 0) {
                 resize(minCapacity);
             }
+
             // We shouldn't accidentally copy a delay buffer
             Buffer(const Buffer& other) = delete;
             Buffer& operator=(const Buffer& other) = delete;
@@ -837,6 +869,7 @@ namespace signalsmith {
                 bufferMask = unsigned(bufferLength - 1);
                 bufferIndex = 0;
             }
+
             void reset(Sample value = Sample()) {
                 buffer.assign(buffer.size(), value);
             }
@@ -850,8 +883,16 @@ namespace signalsmith {
                 unsigned bufferIndex = 0;
 
             public:
-                View(CBuffer& buffer, int offset = 0) : buffer(&buffer), bufferIndex(buffer.bufferIndex + (unsigned)offset) {}
-                View(const View& other, int offset = 0) : buffer(other.buffer), bufferIndex(other.bufferIndex + (unsigned)offset) {}
+                View(CBuffer& buffer, int offset = 0)
+                    : buffer(&buffer),
+                      bufferIndex(buffer.bufferIndex + (unsigned)offset) {
+                }
+
+                View(const View& other, int offset = 0)
+                    : buffer(other.buffer),
+                      bufferIndex(other.bufferIndex + (unsigned)offset) {
+                }
+
                 View& operator=(const View& other) {
                     buffer = other.buffer;
                     bufferIndex = other.bufferIndex;
@@ -861,6 +902,7 @@ namespace signalsmith {
                 CSample& operator[](int offset) {
                     return buffer->buffer[(bufferIndex + (unsigned)offset) & buffer->bufferMask];
                 }
+
                 const Sample& operator[](int offset) const {
                     return buffer->buffer[(bufferIndex + (unsigned)offset) & buffer->bufferMask];
                 }
@@ -872,6 +914,7 @@ namespace signalsmith {
                         (*this)[i] = data[i];
                     }
                 }
+
                 /// Read data out from the buffer
                 template <typename Data>
                 void read(int length, Data&& data) const {
@@ -883,19 +926,23 @@ namespace signalsmith {
                 View operator+(int offset) const {
                     return View(*this, offset);
                 }
+
                 View operator-(int offset) const {
                     return View(*this, -offset);
                 }
             };
+
             using MutableView = View<false>;
             using ConstView = View<true>;
 
             MutableView view(int offset = 0) {
                 return MutableView(*this, offset);
             }
+
             ConstView view(int offset = 0) const {
                 return ConstView(*this, offset);
             }
+
             ConstView constView(int offset = 0) const {
                 return ConstView(*this, offset);
             }
@@ -903,6 +950,7 @@ namespace signalsmith {
             Sample& operator[](int offset) {
                 return buffer[(bufferIndex + (unsigned)offset) & bufferMask];
             }
+
             const Sample& operator[](int offset) const {
                 return buffer[(bufferIndex + (unsigned)offset) & bufferMask];
             }
@@ -914,6 +962,7 @@ namespace signalsmith {
                     (*this)[i] = data[i];
                 }
             }
+
             /// Read data out from the buffer
             template <typename Data>
             void read(int length, Data&& data) const {
@@ -926,14 +975,17 @@ namespace signalsmith {
                 ++bufferIndex;
                 return *this;
             }
+
             Buffer& operator+=(int i) {
                 bufferIndex += (unsigned)i;
                 return *this;
             }
+
             Buffer& operator--() {
                 --bufferIndex;
                 return *this;
             }
+
             Buffer& operator-=(int i) {
                 bufferIndex -= (unsigned)i;
                 return *this;
@@ -944,20 +996,25 @@ namespace signalsmith {
                 ++bufferIndex;
                 return view;
             }
+
             MutableView operator+(int i) {
                 return MutableView(*this, i);
             }
+
             ConstView operator+(int i) const {
                 return ConstView(*this, i);
             }
+
             MutableView operator--(int) {
                 MutableView view(*this);
                 --bufferIndex;
                 return view;
             }
+
             MutableView operator-(int i) {
                 return MutableView(*this, -i);
             }
+
             ConstView operator-(int i) const {
                 return ConstView(*this, -i);
             }
@@ -979,13 +1036,18 @@ namespace signalsmith {
             using ConstChannel = typename Buffer<Sample>::ConstView;
             using MutableChannel = typename Buffer<Sample>::MutableView;
 
-            MultiBuffer(int channels = 0, int capacity = 0) : channels(channels), stride(capacity), buffer(channels * capacity) {}
+            MultiBuffer(int channels = 0, int capacity = 0)
+                : channels(channels),
+                  stride(capacity),
+                  buffer(channels * capacity) {
+            }
 
             void resize(int nChannels, int capacity, Sample value = Sample()) {
                 channels = nChannels;
                 stride = capacity;
                 buffer.resize(channels * capacity, value);
             }
+
             void reset(Sample value = Sample()) {
                 buffer.reset(value);
             }
@@ -999,12 +1061,22 @@ namespace signalsmith {
                 int channels, stride;
 
             public:
-                Stride(CChannel view, int channels, int stride) : view(view), channels(channels), stride(stride) {}
-                Stride(const Stride& other) : view(other.view), channels(other.channels), stride(other.stride) {}
+                Stride(CChannel view, int channels, int stride)
+                    : view(view),
+                      channels(channels),
+                      stride(stride) {
+                }
+
+                Stride(const Stride& other)
+                    : view(other.view),
+                      channels(other.channels),
+                      stride(other.stride) {
+                }
 
                 CSample& operator[](int channel) {
                     return view[channel * stride];
                 }
+
                 const Sample& operator[](int channel) const {
                     return view[channel * stride];
                 }
@@ -1016,6 +1088,7 @@ namespace signalsmith {
                         result[c] = view[c * stride];
                     }
                 }
+
                 /// Writes from multi-channel data into the buffer
                 template <class Data>
                 void set(Data&& data) {
@@ -1023,11 +1096,13 @@ namespace signalsmith {
                         view[c * stride] = data[c];
                     }
                 }
+
                 template <class Data>
                 Stride& operator=(const Data& data) {
                     set(data);
                     return *this;
                 }
+
                 Stride& operator=(const Stride& data) {
                     set(data);
                     return *this;
@@ -1037,6 +1112,7 @@ namespace signalsmith {
             Stride<false> at(int offset) {
                 return { buffer.view(offset), channels, stride };
             }
+
             Stride<true> at(int offset) const {
                 return { buffer.view(offset), channels, stride };
             }
@@ -1049,11 +1125,16 @@ namespace signalsmith {
                 int channels, stride;
 
             public:
-                View(CChannel view, int channels, int stride) : view(view), channels(channels), stride(stride) {}
+                View(CChannel view, int channels, int stride)
+                    : view(view),
+                      channels(channels),
+                      stride(stride) {
+                }
 
                 CChannel operator[](int channel) {
                     return view + channel * stride;
                 }
+
                 ConstChannel operator[](int channel) const {
                     return view + channel * stride;
                 }
@@ -1061,19 +1142,23 @@ namespace signalsmith {
                 Stride<isConst> at(int offset) {
                     return { view + offset, channels, stride };
                 }
+
                 Stride<true> at(int offset) const {
                     return { view + offset, channels, stride };
                 }
             };
+
             using MutableView = View<false>;
             using ConstView = View<true>;
 
             MutableView view(int offset = 0) {
                 return MutableView(buffer.view(offset), channels, stride);
             }
+
             ConstView view(int offset = 0) const {
                 return ConstView(buffer.view(offset), channels, stride);
             }
+
             ConstView constView(int offset = 0) const {
                 return ConstView(buffer.view(offset), channels, stride);
             }
@@ -1081,6 +1166,7 @@ namespace signalsmith {
             MutableChannel operator[](int channel) {
                 return buffer + channel * stride;
             }
+
             ConstChannel operator[](int channel) const {
                 return buffer + channel * stride;
             }
@@ -1089,33 +1175,42 @@ namespace signalsmith {
                 ++buffer;
                 return *this;
             }
+
             MultiBuffer& operator+=(int i) {
                 buffer += i;
                 return *this;
             }
+
             MutableView operator++(int) {
                 return MutableView(buffer++, channels, stride);
             }
+
             MutableView operator+(int i) {
                 return MutableView(buffer + i, channels, stride);
             }
+
             ConstView operator+(int i) const {
                 return ConstView(buffer + i, channels, stride);
             }
+
             MultiBuffer& operator--() {
                 --buffer;
                 return *this;
             }
+
             MultiBuffer& operator-=(int i) {
                 buffer -= i;
                 return *this;
             }
+
             MutableView operator--(int) {
                 return MutableView(buffer--, channels, stride);
             }
+
             MutableView operator-(int i) {
                 return MutableView(buffer - i, channels, stride);
             }
+
             ConstView operator-(int i) const {
                 return ConstView(buffer - i, channels, stride);
             }
@@ -1136,6 +1231,7 @@ namespace signalsmith {
                 return data[0];
             }
         };
+
         /// Linear interpolator
         /// \diagram{delay-random-access-linear.svg,aliasing and maximum amplitude/delay errors for different input frequencies}
         template <typename Sample>
@@ -1149,6 +1245,7 @@ namespace signalsmith {
                 return a + fractional * (b - a);
             }
         };
+
         /// Spline cubic interpolator
         /// \diagram{delay-random-access-cubic.svg,aliasing and maximum amplitude/delay errors for different input frequencies}
         template <typename Sample>
@@ -1182,19 +1279,28 @@ namespace signalsmith {
                 Right right;
 
                 const Sample total;
-                ProductRange(Sample x) : left(x), right(x), total(left.total * right.total) {}
+
+                ProductRange(Sample x)
+                    : left(x),
+                      right(x),
+                      total(left.total * right.total) {
+                }
 
                 template <class Data>
                 Sample calculateResult(Sample extraFactor, const Data& data, const Array& invFactors) {
                     return left.calculateResult(extraFactor * right.total, data, invFactors) + right.calculateResult(extraFactor * left.total, data, invFactors);
                 }
             };
+
             template <typename Sample, int n, int index>
             struct ProductRange<Sample, n, index, index> {
                 using Array = std::array<Sample, (n + 1)>;
 
                 const Sample total;
-                ProductRange(Sample x) : total(x - index) {}
+
+                ProductRange(Sample x)
+                    : total(x - index) {
+                }
 
                 template <class Data>
                 Sample calculateResult(Sample extraFactor, const Data& data, const Array& invFactors) {
@@ -1236,6 +1342,7 @@ namespace signalsmith {
                 return left.calculateResult(right.total, data, invDivisors) + right.calculateResult(left.total, data, invDivisors);
             }
         };
+
         template <typename Sample>
         using InterpolatorLagrange3 = InterpolatorLagrangeN<Sample, 3>;
         template <typename Sample>
@@ -1256,8 +1363,14 @@ namespace signalsmith {
             int subSampleSteps;
             std::vector<Sample> coefficients;
 
-            InterpolatorKaiserSincN() : InterpolatorKaiserSincN(0.5 - 0.45 / std::sqrt(n)) {}
-            InterpolatorKaiserSincN(double passFreq) : InterpolatorKaiserSincN(passFreq, 1 - passFreq) {}
+            InterpolatorKaiserSincN()
+                : InterpolatorKaiserSincN(0.5 - 0.45 / std::sqrt(n)) {
+            }
+
+            InterpolatorKaiserSincN(double passFreq)
+                : InterpolatorKaiserSincN(passFreq, 1 - passFreq) {
+            }
+
             InterpolatorKaiserSincN(double passFreq, double stopFreq) {
                 subSampleSteps = 2 * n; // Heuristic again.  Really it depends on the bandwidth as well.
                 double kaiserBandwidth = (stopFreq - passFreq) * (n + 1.0 / subSampleSteps);
@@ -1365,9 +1478,13 @@ namespace signalsmith {
             using Super = Interpolator<Sample>;
 
         public:
-            Reader() {}
+            Reader() {
+            }
+
             /// Pass in a configured interpolator
-            Reader(const Interpolator<Sample>& interpolator) : Super(interpolator) {}
+            Reader(const Interpolator<Sample>& interpolator)
+                : Super(interpolator) {
+            }
 
             template <typename Buffer>
             Sample read(const Buffer& buffer, Sample delaySamples) const {
@@ -1378,6 +1495,7 @@ namespace signalsmith {
                 using View = decltype(buffer - startIndex);
                 struct Flipped {
                     View view;
+
                     Sample operator[](int i) const {
                         return view[-i];
                     }
@@ -1395,13 +1513,20 @@ namespace signalsmith {
         public:
             static constexpr Sample latency = Super::latency;
 
-            Delay(int capacity = 0) : buffer(1 + capacity + Super::inputLength) {}
+            Delay(int capacity = 0)
+                : buffer(1 + capacity + Super::inputLength) {
+            }
+
             /// Pass in a configured interpolator
-            Delay(const Interpolator<Sample>& interp, int capacity = 0) : Super(interp), buffer(1 + capacity + Super::inputLength) {}
+            Delay(const Interpolator<Sample>& interp, int capacity = 0)
+                : Super(interp),
+                  buffer(1 + capacity + Super::inputLength) {
+            }
 
             void reset(Sample value = Sample()) {
                 buffer.reset(value);
             }
+
             void resize(int minCapacity, Sample value = Sample()) {
                 buffer.resize(minCapacity + Super::inputLength, value);
             }
@@ -1412,6 +1537,7 @@ namespace signalsmith {
             Sample read(Sample delaySamples) const {
                 return Super::read(buffer, delaySamples);
             }
+
             /// Writes a sample. Returns the same object, so that you can say `delay.write(v).read(delay)`.
             Delay& write(Sample value) {
                 ++buffer;
@@ -1430,11 +1556,15 @@ namespace signalsmith {
         public:
             static constexpr Sample latency = Super::latency;
 
-            MultiDelay(int channels = 0, int capacity = 0) : channels(channels), multiBuffer(channels, 1 + capacity + Super::inputLength) {}
+            MultiDelay(int channels = 0, int capacity = 0)
+                : channels(channels),
+                  multiBuffer(channels, 1 + capacity + Super::inputLength) {
+            }
 
             void reset(Sample value = Sample()) {
                 multiBuffer.reset(value);
             }
+
             void resize(int nChannels, int capacity, Sample value = Sample()) {
                 channels = nChannels;
                 multiBuffer.resize(channels, capacity + Super::inputLength, value);
@@ -1451,6 +1581,7 @@ namespace signalsmith {
                     return reader.read(channel, delaySamples);
                 }
             };
+
             ChannelView operator[](int channel) const {
                 return ChannelView{ *this, multiBuffer[channel] };
             }
@@ -1466,9 +1597,11 @@ namespace signalsmith {
                     return reader.read(view[c], delaySamples);
                 }
             };
+
             DelayView read(Sample delaySamples) {
                 return DelayView{ *this, multiBuffer.constView(), delaySamples };
             }
+
             /// Reads into the provided output structure
             template <class Output>
             void read(Sample delaySamples, Output& output) {
@@ -1476,6 +1609,7 @@ namespace signalsmith {
                     output[c] = Super::read(multiBuffer[c], delaySamples);
                 }
             }
+
             /// Reads separate delays for each channel
             template <class Delays, class Output>
             void readMulti(const Delays& delays, Output& output) {
@@ -1483,6 +1617,7 @@ namespace signalsmith {
                     output[c] = Super::read(multiBuffer[c], delays[c]);
                 }
             }
+
             template <class Data>
             MultiDelay& write(const Data& data) {
                 ++multiBuffer;
@@ -1525,15 +1660,19 @@ namespace signalsmith {
             static int fastSizeAbove(int size, int divisor = 1) {
                 return MRFFT::fastSizeAbove(size / divisor) * divisor;
             }
+
             /// Returns a fast FFT size >= `size`
             static int fastSizeBelow(int size, int divisor = 1) {
                 return MRFFT::fastSizeBelow(1 + (size - 1) / divisor) * divisor;
             }
 
-            WindowedFFT() {}
+            WindowedFFT() {
+            }
+
             WindowedFFT(int size) {
                 setSize(size);
             }
+
             template <class WindowFn>
             WindowedFFT(int size, WindowFn fn, Sample windowOffset = 0.5) {
                 setSize(size, fn, windowOffset);
@@ -1547,6 +1686,7 @@ namespace signalsmith {
                 freqBuffer.resize(size);
                 return fftWindow;
             }
+
             /// Sets the FFT size, with a user-defined functor for the window
             template <class WindowFn>
             void setSize(int size, WindowFn fn, Sample windowOffset = 0.5) {
@@ -1558,18 +1698,21 @@ namespace signalsmith {
                     fftWindow[i] = fn(r);
                 }
             }
+
             /// Sets the size (using the default Blackman-Harris window)
             void setSize(int size) {
-                setSize(size, [](double x) {
-                    double phase = 2 * M_PI * x;
-                    // Blackman-Harris
-                    return 0.35875 + 0.48829 * std::cos(phase) + 0.14128 * std::cos(phase * 2) + 0.1168 * std::cos(phase * 3);
-                });
+                setSize(size,
+                        [](double x) {
+                            double phase = 2 * M_PI * x;
+                            // Blackman-Harris
+                            return 0.35875 + 0.48829 * std::cos(phase) + 0.14128 * std::cos(phase * 2) + 0.1168 * std::cos(phase * 3);
+                        });
             }
 
             const std::vector<Sample>& window() const {
                 return this->fftWindow;
             }
+
             int size() const {
                 return mrfft.size();
             }
@@ -1587,6 +1730,7 @@ namespace signalsmith {
 
                 mrfft.fft(WindowedInput{ input, fftWindow }, output);
             }
+
             /// Performs an FFT (no windowing)
             template <class Input, class Output>
             void fftRaw(Input&& input, Output&& output) {
@@ -1603,6 +1747,7 @@ namespace signalsmith {
                     output[i] *= norm * fftWindow[i];
                 }
             }
+
             /// Performs an IFFT (no windowing)
             template <class Input, class Output>
             void ifftRaw(Input&& input, Output&& output) {
@@ -1660,8 +1805,15 @@ namespace signalsmith {
                 std::vector<Complex> buffer;
 
             public:
-                MultiSpectrum() : MultiSpectrum(0, 0) {}
-                MultiSpectrum(int channels, int bands) : channels(channels), stride(bands), buffer(channels * bands, 0) {}
+                MultiSpectrum()
+                    : MultiSpectrum(0, 0) {
+                }
+
+                MultiSpectrum(int channels, int bands)
+                    : channels(channels),
+                      stride(bands),
+                      buffer(channels * bands, 0) {
+                }
 
                 void resize(int nChannels, int nBands) {
                     channels = nChannels;
@@ -1681,6 +1833,7 @@ namespace signalsmith {
                 Complex* operator[](int channel) {
                     return buffer.data() + channel * stride;
                 }
+
                 const Complex* operator[](int channel) const {
                     return buffer.data() + channel * stride;
                 }
@@ -1688,13 +1841,14 @@ namespace signalsmith {
                 [[maybe_unused]] [[nodiscard]] SIGNALSMITH_INLINE int getChannels() const { return channels; }
                 [[maybe_unused]] [[nodiscard]] SIGNALSMITH_INLINE int getStride() const { return stride; }
             };
+
             std::vector<Sample> timeBuffer;
 
             void resizeInternal(int newChannels, int windowSize, int newInterval, int historyLength, int zeroPadding) {
                 Super::resize(newChannels,
-                              windowSize        /* for output summing */
-                                  + newInterval /* so we can read `windowSize` ahead (we'll be at most `interval-1` from the most recent block */
-                                  + historyLength);
+                              windowSize    /* for output summing */
+                              + newInterval /* so we can read `windowSize` ahead (we'll be at most `interval-1` from the most recent block */
+                              + historyLength);
 
                 int fftSize = fft.fastSizeAbove(windowSize + zeroPadding);
 
@@ -1733,15 +1887,20 @@ namespace signalsmith {
             \diagram{stft-windows-acg.svg,ACG windows and partial cumulative sum}
             However, it generally has worse performance in terms of total sidelobe energy, affecting worst-case aliasing levels for (most) higher overlap ratios:
             \diagram{stft-aliasing-simulated-acg.svg,Simulated bad-case aliasing for ACG windows - compare with above}*/
-            enum class Window { kaiser,
-                                acg };
+            enum class Window {
+                kaiser,
+                acg
+            };
+
             Window windowShape = Window::kaiser;
 
             using Spectrum = MultiSpectrum;
             Spectrum spectrum;
             WindowedFFT<Sample> fft;
 
-            STFT() {}
+            STFT() {
+            }
+
             /// Parameters passed straight to `.resize()`
             STFT(int channels, int windowSize, int interval, int historyLength = 0, int zeroPadding = 0) {
                 resize(channels, windowSize, interval, historyLength, zeroPadding);
@@ -1755,16 +1914,20 @@ namespace signalsmith {
             int windowSize() const {
                 return _windowSize;
             }
+
             int fftSize() const {
                 return _fftSize;
             }
+
             int interval() const {
                 return _interval;
             }
+
             /// Returns the (analysis and synthesis) window
             decltype(fft.window()) window() const {
                 return fft.window();
             }
+
             /// Calculates the effective window for the partially-summed future output (relative to the most recent block)
             std::vector<Sample> partialSumWindow() const {
                 const auto& w = window();
@@ -1815,6 +1978,7 @@ namespace signalsmith {
                     validUntilIndex += _interval;
                 }
             }
+
             /// The same as above, assuming index 0
             template <class AnalysisFn>
             void ensureValid(AnalysisFn fn) {
@@ -1830,10 +1994,12 @@ namespace signalsmith {
                     fft.fft(data[c], spectrum[c]);
                 }
             }
+
             template <class Data>
             void analyse(int c, Data&& data) {
                 fft.fft(data, spectrum[c]);
             }
+
             /// Analyse without windowing
             template <class Data>
             void analyseRaw(Data&& data) {
@@ -1841,6 +2007,7 @@ namespace signalsmith {
                     fft.fftRaw(data[c], spectrum[c]);
                 }
             }
+
             template <class Data>
             void analyseRaw(int c, Data&& data) {
                 fft.fftRaw(data, spectrum[c]);
@@ -1864,21 +2031,25 @@ namespace signalsmith {
                 validUntilIndex--;
                 return *this;
             }
+
             STFT& operator+=(int i) {
                 Super::operator+=(i);
                 validUntilIndex -= i;
                 return *this;
             }
+
             STFT& operator--() {
                 Super::operator--();
                 validUntilIndex++;
                 return *this;
             }
+
             STFT& operator-=(int i) {
                 Super::operator-=(i);
                 validUntilIndex += i;
                 return *this;
             }
+
             // @}
 
             typename Super::MutableView operator++(int postIncrement) {
@@ -1886,6 +2057,7 @@ namespace signalsmith {
                 validUntilIndex--;
                 return result;
             }
+
             typename Super::MutableView operator--(int postIncrement) {
                 auto result = Super::operator--(postIncrement);
                 validUntilIndex++;
@@ -1909,13 +2081,15 @@ namespace signalsmith {
 
             /** Alter the spectrum, using input up to this point, for the output block starting from this point.
                     Sub-classes should replace this with whatever processing is desired. */
-            virtual void processSpectrum(int /*blockIndex*/) {}
+            virtual void processSpectrum(int /*blockIndex*/) {
+            }
 
             /// Sets the input/output channels, FFT size and interval.
             void resize(int inChannels, int outChannels, int windowSize, int interval, int historyLength = 0) {
                 Super::resize(outChannels, windowSize, interval, historyLength);
                 input.resize(inChannels, windowSize + interval + historyLength);
             }
+
             void reset(Sample value = Sample()) {
                 Super::reset(value);
                 input.reset(value);
@@ -1927,10 +2101,11 @@ namespace signalsmith {
             }
 
             void ensureValid(int i = 0) {
-                Super::ensureValid(i, [&](int blockIndex) {
-                    this->analyse(input.view(blockIndex - this->windowSize() + 1));
-                    this->processSpectrum(blockIndex);
-                });
+                Super::ensureValid(i,
+                                   [&](int blockIndex) {
+                                       this->analyse(input.view(blockIndex - this->windowSize() + 1));
+                                       this->processSpectrum(blockIndex);
+                                   });
             }
 
             // @name Shift the output, input, and valid index.
@@ -1940,24 +2115,29 @@ namespace signalsmith {
                 ++input;
                 return *this;
             }
+
             ProcessSTFT& operator+=(int i) {
                 Super::operator+=(i);
                 input += i;
                 return *this;
             }
+
             ProcessSTFT& operator--() {
                 Super::operator--();
                 --input;
                 return *this;
             }
+
             ProcessSTFT& operator-=(int i) {
                 Super::operator-=(i);
                 input -= i;
                 return *this;
             }
+
             // @}
         };
 
         /** @} */
     } // namespace spectral
-} // namespace signalsmith
+}     // namespace signalsmith
+#pragma warning(pop)
