@@ -1,10 +1,30 @@
 # SDSP
+Work-In-Progress header only DSP helpers, specifically for the JUCE framework. 
 
-DSP Helper user module for Juce
 
-## Features 
-- Biquads, RBJ formulae and interpolating coefficients 
-- Some half implemented maths stuff 
-- STFT, and OLA capable circular buffers, via a repurposed, single header subset of [Signalsmith](https://signalsmith-audio.co.uk/code/dsp)'s dsp library
-- Audio file loading (with resampling)
-- Inefficient but semi working Phase Vocoder pitch shifting via [Stephan Bernsee](http://blogs.zynaptiq.com/bernsee/pitch-shifting-using-the-ft/)'s tutorial
+# Documentation
+[todo]
+
+# Features 
+
+# Usage 
+The library itself is header only, but can also be used as a JUCE Module.
+## Adding to your project:
+```
+mkdir modules
+cd modules
+git submodule add https://github.com/MeijisIrlnd/SDSP.git
+```
+If you're using the juce cmake api, after your call to `juce_add_target(...)`, adding 
+`juce_add_module(${CMAKE_CURRENT_SOURCE_DIR}/modules/SDSP)` will make the module available. To actually use the module, add `SDSP` to your target link libraries call: 
+
+```
+cmake_minimum_required(VERSION ...)
+juce_add_plugin(Foo ....)
+juce_add_module(${CMAKE_CURRENT_SOURCE_DIR}/modules/SDSP)
+target_sources(Foo .....)
+target_link_libraries(Foo PRIVATE SDSP ...)
+```
+
+
+
