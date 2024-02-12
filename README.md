@@ -57,6 +57,9 @@ If you're using Projucer, you'd just add the path to SDSP in the "Header Search 
 # Tests
 The test coverage is a work-in-progress as well, but there *are* some in the `Tests` directory. The CMakeLists.txt in here simply sets an `SDSP_TEST_SOURCE` variable to the test sources, and expects the parent project to define the test target itself [todo obviously, not this]. Tests are written with Catch2!
 
+# Contributing
+If you'd like to contribute code to SDSP, don't hesititate to open a pull request which I'll review as soon as I can - would appreciate any contributions people make to flesh out the library as much as possible!
+
 # TODO: 
 - SDSP_HEADER_ONLY as an option, allowing you to build as a static lib to help with compilation times as an alternative
 - FetchContent interface
