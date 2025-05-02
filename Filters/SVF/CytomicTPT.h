@@ -25,6 +25,11 @@ namespace SDSP::Filters {
             m_coeffs.setScalars(scalars);
         }
 
+        void reset() {
+            m_ic1Eq = 0.0f;
+            m_ic2Eq = 0.0f;
+        }
+
     private:
         struct InternalCoeffs {
             std::array<float, 3> aCoeffs{ 0.0f, 0.0f, 0.0f };
@@ -40,7 +45,7 @@ namespace SDSP::Filters {
         } m_coeffs;
         float m_ic1Eq{ 0.0f }, m_ic2Eq{ 0.0f };
     };
-}
+} // namespace SDSP::Filters
 
 
-#endif //KALIDEPROTOTYPES2_CYTOMICTPT_H
+#endif // KALIDEPROTOTYPES2_CYTOMICTPT_H

@@ -56,6 +56,10 @@ namespace SDSP::Filters {
             return filtered;
         }
 
+        void reset() {
+            m_filter.reset();
+        }
+
     private:
         void checkFilters(BesselParameters&& params) {
             if (m_samplesUntilFilterUpdate == 0) {

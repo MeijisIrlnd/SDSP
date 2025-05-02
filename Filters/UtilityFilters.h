@@ -5,12 +5,9 @@
 #include "DSPBiquad.h"
 #include "RBJCoefficients.h"
 #include "SmoothedFilterCoefficients.h"
-namespace SDSP::Filters
-{
-    class [[maybe_unused]] SinglePoleLowpass
-    {
+namespace SDSP::Filters {
+    class [[maybe_unused]] SinglePoleLowpass {
     public:
-
         void setCoeff(const float newCoeff) noexcept {
             m_coeff = newCoeff;
         }
@@ -45,7 +42,7 @@ namespace SDSP::Filters
         }
 
         float processSample(float x) {
-            if(m_samplesUntilUpdate == 0) {
+            if (m_samplesUntilUpdate == 0) {
                 SDSP::RBJ::lowShelf(m_lowShelfCoeffs.target(0), m_sampleRate, m_xOverFreq, m_lowShelfGainDb, m_slope);
                 SDSP::RBJ::highShelf(m_highShelfCoeffs.target(0), m_sampleRate, m_xOverFreq, -1.0f * m_lowShelfGainDb, m_slope);
                 m_samplesUntilUpdate = m_updateRate;
@@ -55,6 +52,11 @@ namespace SDSP::Filters
             x = m_lowShelf.processSample(x);
             x = m_highShelf.processSample(x);
             return x;
+        }
+
+        void reset() {
+            m_lowShelf.reset();
+            m_highShelf.reset();
         }
 
         SDSP_INLINE void setCrossoverFreq(float newCrossover) {
@@ -68,6 +70,7 @@ namespace SDSP::Filters
         SDSP_INLINE void setSlope(float newSlope) {
             m_slope = newSlope;
         }
+
     private:
         void interpolate() {
             m_lowShelfCoeffs.interpolate();
@@ -85,4 +88,4 @@ namespace SDSP::Filters
         float m_lowShelfGainDb{ 0.0f };
         float m_slope{ 0.5f };
     };
-}
+} // namespace SDSP::Filters
